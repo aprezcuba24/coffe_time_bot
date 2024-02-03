@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  app: &app
+    user: vscode
+    build:
+      context: .
+      dockerfile: ./compose/local/app/Dockerfile
+    image: coffee_time_bot
+    container_name: coffee_time_bot
+    volumes:
+      - .:/app
+    env_file:
+      - ./.env
+    command: sleep infinity

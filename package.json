@@ -1,0 +1,23 @@
+{
+  "name": "coffee_time_bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "sls deploy",
+    "destroy": "sls remove",
+    "deploy-f": "sls deploy function -f",
+    "logs": "sls logs -f"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "serverless": "^3.18.1",
+    "serverless-python-requirements": "^5.4.0",
+    "serverless-step-functions": "^3.7.0"
+  },
+  "dependencies": {
+    "save-dev": "^0.0.1-security"
+  }
+}
