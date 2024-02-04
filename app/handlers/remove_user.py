@@ -19,9 +19,7 @@ async def remove_user_command(update: Update, context: ContextTypes.DEFAULT_TYPE
     chat = update.effective_chat
     chat_data = await get_chat_item(update, context)
     username = context.args[0]
-    print(chat_data)
     chat_data = remove_user(username, chat_data)
-    print(chat_data)
     await context.application.persistence.update_chat_data(
         chat_id=chat.id, data=chat_data
     )
