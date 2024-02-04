@@ -10,11 +10,11 @@ from telegram.ext import BasePersistence, PersistenceInput
 region = os.environ.get("REGION")
 dynamodb = boto3.resource("dynamodb", region_name=region)
 PERSISTENCE_TABLE = os.environ.get("PERSISTENCE_TABLE")
-RECORD_ID="THE_ONLY_ID_RECORD"
+RECORD_ID = "THE_ONLY_ID_RECORD"
 
 
 class DynamodbPersistence(BasePersistence):
-    '''Using dynamodb to make the bot persistent'''
+    """Using dynamodb to make the bot persistent"""
 
     def __init__(
         self,
@@ -38,12 +38,12 @@ class DynamodbPersistence(BasePersistence):
     async def load_data(self) -> None:
         data = await self.get_persistence_data()
         if data:
-            self.user_data = defaultdict(dict, json.loads(data['user_data']))
-            self.chat_data = defaultdict(dict, json.loads(data['chat_data']))
+            self.user_data = defaultdict(dict, json.loads(data["user_data"]))
+            self.chat_data = defaultdict(dict, json.loads(data["chat_data"]))
             # For backwards compatibility with files not containing bot data
-            self.bot_data = json.loads(data['bot_data'])
-            self.conversations = json.loads(data['conversations'])
-            self.callback_data = json.loads(data['callback_data'])
+            self.bot_data = json.loads(data["bot_data"])
+            self.conversations = json.loads(data["conversations"])
+            self.callback_data = json.loads(data["callback_data"])
         else:
             self.callback_data = dict()
             self.conversations = dict()
@@ -54,11 +54,11 @@ class DynamodbPersistence(BasePersistence):
     async def dump_data(self) -> None:
         data = {
             "persistence_id": RECORD_ID,
-            'conversations': json.dumps(self.conversations),
-            'user_data': json.dumps(self.user_data),
-            'chat_data': json.dumps(self.chat_data),
-            'bot_data': json.dumps(self.bot_data),
-            'callback_data': json.dumps(self.callback_data),
+            "conversations": json.dumps(self.conversations),
+            "user_data": json.dumps(self.user_data),
+            "chat_data": json.dumps(self.chat_data),
+            "bot_data": json.dumps(self.bot_data),
+            "callback_data": json.dumps(self.callback_data),
         }
         table = dynamodb.Table(PERSISTENCE_TABLE)
         table.put_item(Item=data)
@@ -97,7 +97,9 @@ class DynamodbPersistence(BasePersistence):
             result[new_key] = value
         return result
 
-    async def update_conversation(self, name: str, key: Tuple[int, ...], new_state: Optional[object]) -> None:
+    async def update_conversation(
+        self, name: str, key: Tuple[int, ...], new_state: Optional[object]
+    ) -> None:
         new_key = f"{key[0]}|{key[1]}"
         if not self.conversations:
             self.conversations = dict()

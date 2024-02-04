@@ -11,7 +11,7 @@ from app.utils.dispatcher import Dispatcher
 
 def main(event, context):
     print(event)
-    TELEGRAM_TOKEN = os.environ.get('TELEGRAM_TOKEN')
+    TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
     bot = Bot(token=TELEGRAM_TOKEN)
     routes = {
         "/webhook": webhook,
@@ -31,25 +31,19 @@ def not_found(event, *args):
 def webhook(event, bot: Bot):
     data = json.loads(event["body"])
     update = Update.de_json(data, bot)
-    dispatcher = Dispatcher(bot=bot, update_queue=Queue(), context_types=ContextTypes(context=CallbackContext))
+    dispatcher = Dispatcher(
+        bot=bot,
+        update_queue=Queue(),
+        context_types=ContextTypes(context=CallbackContext),
+    )
     configure_handlers(dispatcher)
     dispatcher.process_update(update=update)
-    return {
-        "statusCode": 200,
-        "body": "ok"
-    }
+    return {"statusCode": 200, "body": "ok"}
 
 
 def register_bot(event, bot: Bot):
     url = f"https://{event['requestContext']['domainName']}/webhook"
     bot.setWebhook(url)
-    body = {
-        "webhook_url": url,
-        "bot": bot.get_me().to_dict(),
-        "input": event
-    }
+    body = {"webhook_url": url, "bot": bot.get_me().to_dict(), "input": event}
     configure(bot)
-    return {
-        "statusCode": 200,
-        "body": json.dumps(body)
-    }
+    return {"statusCode": 200, "body": json.dumps(body)}
