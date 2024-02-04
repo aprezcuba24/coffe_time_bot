@@ -26,20 +26,23 @@ async def test_a_arg_is_not_a_username():
 
 
 @pytest.mark.asyncio
-async def test_complete():
+@patch(
+    "app.handlers.add_user.get_chat_item",
+    return_value={"users": {"@aaa": {"data": 1}}, "active_users": ["@aaa"]},
+)
+async def test_complete(*args):
     update = AsyncMock()
     context = AsyncMock()
     context.args = ["@aaa", "@bbb"]
     update.effective_chat.id = 1
-
-    async def get_chat_data():
-        return {1: {"users": {"@aaa": {"data": 1}}}}
-
-    context.application.persistence.get_chat_data = get_chat_data
     await add_user_command(update, context)
     update.effective_message.reply_text.assert_called_once_with(
         text="Los usuarios fueron añadidos."
     )
     context.application.persistence.update_chat_data.assert_called_once_with(
-        chat_id=1, data={"users": {"@aaa": {"data": 1}, "@bbb": {}}}
+        chat_id=1,
+        data={
+            "users": {"@aaa": {"data": 1}, "@bbb": {}},
+            "active_users": ["@aaa", "@bbb"],
+        },
     )

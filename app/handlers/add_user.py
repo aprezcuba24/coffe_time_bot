@@ -1,5 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
+from app.services.chat import add_user, get_chat_item
 
 
 def validate(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -14,21 +15,11 @@ def validate(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
 
-def add_user(username, chat_data):
-    if "users" not in chat_data:
-        chat_data["users"] = {}
-    if username in chat_data["users"]:
-        return chat_data
-    chat_data["users"][username] = {}
-    return chat_data
-
-
 async def add_user_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if validate(update=update, context=context) is not None:
         return
     chat = update.effective_chat
-    chats = await context.application.persistence.get_chat_data()
-    chat_data = chats[chat.id]
+    chat_data = await get_chat_item(update, context)
     for username in context.args:
         chat_data = add_user(username, chat_data)
     await context.application.persistence.update_chat_data(

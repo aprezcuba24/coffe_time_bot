@@ -10,7 +10,7 @@ from telegram.ext import BasePersistence, PersistenceInput
 region = os.environ.get("REGION")
 dynamodb = boto3.resource("dynamodb", region_name=region)
 PERSISTENCE_TABLE = os.environ.get("PERSISTENCE_TABLE")
-RECORD_ID = "THE_ONLY_ID_RECORD"
+RECORD_ID = "TELEGRAM_CHAT_DATA"
 
 
 class DynamodbPersistence(BasePersistence):
