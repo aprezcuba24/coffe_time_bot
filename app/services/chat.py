@@ -108,3 +108,43 @@ async def register_point(
     await context.application.persistence.update_chat_data(
         chat_id=update.effective_chat.id, data=chat_data
     )
+
+
+def _get_users_by_score(cycle):
+    min_value = 7
+    users = []
+    for key, item in cycle["points"].items():
+        if item["value"] < min_value:
+            users = [(key, item)]
+            min_value = item["value"]
+        elif item["value"] == min_value:
+            users.append((key, item))
+    return [key for key, item in users]
+
+
+async def game_over(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await has_open_game():
+        return None
+    chat_data = await get_chat_item(update, context)
+    last_cycle = await _get_last_cycle(update, context)
+    usernames = _get_users_by_score(last_cycle)
+    if len(usernames) > 1:
+        cycles = chat_data["cycles"]
+        cycles.append(
+            {
+                "users": usernames,
+                "points": {},
+            }
+        )
+        chat_data["cycles"] = cycles
+    else:
+        user = usernames[0]
+        if user not in chat_data["users"]:
+            chat_data["users"][user] = {}
+        score = chat_data["users"][user].get("score", 0)
+        chat_data["users"][user]["score"] = score + 1
+        chat_data["cycles"] = []
+    await context.application.persistence.update_chat_data(
+        chat_id=update.effective_chat.id, data=chat_data
+    )
+    return usernames
