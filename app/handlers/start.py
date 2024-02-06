@@ -1,6 +1,6 @@
 from string import Template
-from telegram import Update
 
+from telegram import Update
 
 START_TEXT = """
 Hello "$name"!!

@@ -1,13 +1,14 @@
-from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
+
 from app.services.chat import (
-    is_active_user,
     has_open_game,
-    user_has_dice,
-    user_can_dice,
-    register_point,
+    is_active_user,
     open_game,
+    register_point,
     start_params,
+    user_can_dice,
+    user_has_dice,
 )
 
 

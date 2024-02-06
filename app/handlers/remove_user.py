@@ -1,6 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from app.services.chat import remove_user, get_chat_item
+
+from app.services.chat import get_chat_item, remove_user
 
 
 def validate(update: Update, context: ContextTypes.DEFAULT_TYPE):

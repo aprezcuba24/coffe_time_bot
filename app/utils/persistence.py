@@ -1,11 +1,11 @@
 import json
 import os
-import boto3
 from collections import defaultdict
 from copy import deepcopy
 from typing import Any, DefaultDict, Dict, Optional, Tuple
-from telegram.ext import BasePersistence, PersistenceInput
 
+import boto3
+from telegram.ext import BasePersistence, PersistenceInput
 
 region = os.environ.get("REGION")
 dynamodb = boto3.resource("dynamodb", region_name=region)

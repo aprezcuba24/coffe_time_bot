@@ -1,7 +1,9 @@
+from unittest.mock import AsyncMock, patch
+
 import pytest
 from telegram import InlineKeyboardMarkup
-from unittest.mock import AsyncMock, patch
-from app.handlers.game import play_command, YES_BUTTON, NO_BUTTON
+
+from app.handlers.game import NO_BUTTON, YES_BUTTON, play_command
 
 
 @pytest.mark.asyncio

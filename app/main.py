@@ -1,11 +1,12 @@
 import json
 import os
-from telegram import Update, Bot
-from telegram.ext import ContextTypes
 from queue import Queue
 
-from app.utils.callback_context import CallbackContext
+from telegram import Bot, Update
+from telegram.ext import ContextTypes
+
 from app.config import configure, configure_handlers
+from app.utils.callback_context import CallbackContext
 from app.utils.dispatcher import Dispatcher
 
 

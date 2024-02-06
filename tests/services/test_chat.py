@@ -1,16 +1,18 @@
-import pytest
 from collections import defaultdict
-from unittest.mock import MagicMock, AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
+
 from app.services.chat import (
     add_user,
-    remove_user,
     get_chat_item,
     has_open_game,
-    open_game,
     is_active_user,
-    user_has_dice,
-    user_can_dice,
+    open_game,
     register_point,
+    remove_user,
+    user_can_dice,
+    user_has_dice,
 )
 
 

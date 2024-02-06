@@ -1,7 +1,7 @@
-from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
-from app.services.chat import has_open_game, open_game, start_params
 
+from app.services.chat import has_open_game, open_game, start_params
 
 YES_BUTTON = InlineKeyboardButton(text="Si", callback_data="game_yes_play")
 NO_BUTTON = InlineKeyboardButton(text="No", callback_data="game_no_play")

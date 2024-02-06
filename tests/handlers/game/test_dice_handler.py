@@ -1,6 +1,8 @@
+from unittest.mock import AsyncMock, patch
+
 import pytest
 from telegram import InlineKeyboardMarkup
-from unittest.mock import AsyncMock, patch
+
 from app.handlers.dice import dice_handler, get_buttons
 
 

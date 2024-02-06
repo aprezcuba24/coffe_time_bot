@@ -1,12 +1,12 @@
 import telegram
-from telegram.ext import CommandHandler, CallbackQueryHandler, MessageHandler, filters
+from telegram.ext import CallbackQueryHandler, CommandHandler, MessageHandler, filters
 
-from app.handlers.start import start_command, start_query
 from app.handlers.add_user import add_user_command
-from app.handlers.remove_user import remove_user_command
 from app.handlers.dice import dice_handler, no_play_dice_query, yes_play_dice_query
-from app.handlers.game import play_command, play_yes_query, play_no_query
+from app.handlers.game import play_command, play_no_query, play_yes_query
 from app.handlers.game_over import game_over_command
+from app.handlers.remove_user import remove_user_command
+from app.handlers.start import start_command, start_query
 
 
 async def configure(bot: telegram.Bot):

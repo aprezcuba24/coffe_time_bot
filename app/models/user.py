@@ -1,7 +1,7 @@
 import os
-import boto3
 from datetime import datetime
 
+import boto3
 
 region = os.environ.get("REGION")
 dynamodb = boto3.resource("dynamodb", region_name=region)
