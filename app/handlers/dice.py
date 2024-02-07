@@ -2,11 +2,14 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 
 from app.services.chat import (
+    game_over,
     has_open_game,
     is_active_user,
+    is_the_last,
     open_game,
     register_point,
     start_params,
+    the_winner,
     user_can_dice,
     user_has_dice,
 )
@@ -41,6 +44,11 @@ async def dice_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text="No puedes votar en esta ronda.",
         )
     await register_point(update, context)
+    if await is_the_last(update, context):
+        users = await game_over(update, context)
+        await update.get_bot().send_message(
+            chat_id=update.effective_chat.id, **the_winner(users[0])
+        )
 
 
 def no_play_dice_query(update: Update, *args):

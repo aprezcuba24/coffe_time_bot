@@ -62,9 +62,31 @@ async def test_no_user_can_dice(*args):
 @patch("app.handlers.dice.user_has_dice", return_value=False)
 @patch("app.handlers.dice.user_can_dice", return_value=True)
 @patch("app.handlers.dice.register_point")
+@patch("app.handlers.dice.is_the_last", return_value=False)
 async def test_register_point(register_point_mock, *args):
     update = AsyncMock()
     context = AsyncMock()
     await dice_handler(update, context)
     update.effective_message.reply_text.assert_not_called()
     register_point_mock.assert_called_once_with(update, context)
+    update._bot.send_message.assert_not_called()
+
+
+@pytest.mark.asyncio
+@patch("app.handlers.dice.is_active_user", return_value=True)
+@patch("app.handlers.dice.has_open_game", return_value=True)
+@patch("app.handlers.dice.user_has_dice", return_value=False)
+@patch("app.handlers.dice.user_can_dice", return_value=True)
+@patch("app.handlers.dice.is_the_last", return_value=True)
+@patch("app.handlers.dice.game_over", return_value=["@aaa"])
+@patch("app.handlers.dice.register_point")
+async def test_register_point(register_point_mock, *args):
+    update = AsyncMock()
+    update.effective_chat.id = 1
+    bot = AsyncMock()
+    update.get_bot = lambda: bot
+    context = AsyncMock()
+    await dice_handler(update, context)
+    update.effective_message.reply_text.assert_not_called()
+    register_point_mock.assert_called_once_with(update, context)
+    bot.send_message.assert_called_once_with(chat_id=1, text="Tenemos un ganador @aaa")

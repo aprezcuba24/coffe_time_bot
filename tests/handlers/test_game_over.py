@@ -26,7 +26,7 @@ async def test_has_a_winner(*args):
 
 
 @pytest.mark.asyncio
-@patch("app.handlers.game_over.game_over", return_value=["@aaa", '@bbb'])
+@patch("app.handlers.game_over.game_over", return_value=["@aaa", "@bbb"])
 async def test_a_new_cycle(*args):
     update = AsyncMock()
     assert await game_over_command(update, None)

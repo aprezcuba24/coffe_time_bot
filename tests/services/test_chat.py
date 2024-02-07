@@ -8,6 +8,7 @@ from app.services.chat import (
     get_chat_item,
     has_open_game,
     is_active_user,
+    is_the_last,
     open_game,
     register_point,
     remove_user,
@@ -236,3 +237,21 @@ async def test_register_point_other_message_id_and_value(*args):
         chat_id=1,
         data={"cycles": [{"points": {"@aaa": {"message_id": 6666, "value": 4}}}]},
     )
+
+
+@pytest.mark.asyncio
+@patch(
+    "app.services.chat._get_last_cycle",
+    return_value={"users": ["@aaa", "@bbb"], "points": {"@aaa": {}}},
+)
+async def test_is_the_last_no(*args):
+    assert await is_the_last(None, None) is False
+
+
+@pytest.mark.asyncio
+@patch(
+    "app.services.chat._get_last_cycle",
+    return_value={"users": ["@aaa", "@bbb"], "points": {"@aaa": {}, "@bbb": {}}},
+)
+async def test_is_the_last_no(*args):
+    assert await is_the_last(None, None) is True

@@ -6,6 +6,10 @@ def start_params(users):
     return {"text": f"gogogogogogogogogogogogo \n {' '.join(users)}"}
 
 
+def the_winner(user):
+    return {"text": f"Tenemos un ganador {user}"}
+
+
 def add_user(username, chat_data):
     if username in chat_data["users"] and username in chat_data["active_users"]:
         return chat_data
@@ -122,8 +126,14 @@ def _get_users_by_score(cycle):
     return [key for key, item in users]
 
 
+async def is_the_last(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    last_cycle = await _get_last_cycle(update, context)
+    print(last_cycle)
+    return len(last_cycle["users"]) == len(last_cycle["points"])
+
+
 async def game_over(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not await has_open_game():
+    if not await has_open_game(update, context):
         return None
     chat_data = await get_chat_item(update, context)
     last_cycle = await _get_last_cycle(update, context)
