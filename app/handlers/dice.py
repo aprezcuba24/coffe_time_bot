@@ -59,6 +59,6 @@ async def yes_play_dice_query(update: Update, context: ContextTypes.DEFAULT_TYPE
     if await has_open_game(update, context):
         return
     parts = update.callback_query.data.split("/")
-    await register_point(update, context, int(parts[1]), int(parts[2]))
     users = await open_game(update, context)
-    return update.effective_message.edit_text(**start_params(users))
+    await register_point(update, context, int(parts[1]), int(parts[2]))
+    return await update.effective_message.edit_text(**start_params(users))
