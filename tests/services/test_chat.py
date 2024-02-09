@@ -9,7 +9,7 @@ from tests.util import get_chat
 async def test_add_user_it_there():
     tester = await get_chat({"users": {"@aaa": {}}, "active_users": ["@aaa"]})
     tester.chat.add_user("@bbb")
-    await tester.assert_save(
+    tester.assert_chat_data(
         {
             "users": {"@aaa": {}, "@bbb": {}},
             "active_users": ["@aaa", "@bbb"],
@@ -27,7 +27,7 @@ async def test_remove_user():
         }
     )
     tester.chat.remove_user("@bbb")
-    await tester.assert_save(
+    tester.assert_chat_data(
         {"users": {"@aaa": {}, "@bbb": {}}, "active_users": ["@aaa"], "cycles": []}
     )
 
@@ -35,7 +35,7 @@ async def test_remove_user():
 @pytest.mark.asyncio
 async def test_get_chat_item_not_chat():
     tester = await get_chat(defaultdict(dict, {}))
-    await tester.assert_save({"users": {}, "active_users": [], "cycles": []})
+    tester.assert_chat_data({"users": {}, "active_users": [], "cycles": []})
 
 
 @pytest.mark.asyncio
@@ -43,7 +43,7 @@ async def test_get_chat_item_has_chat():
     tester = await get_chat(
         {"users": {"@aaaa": {}}, "active_users": ["@aaaa"], "cycles": []}
     )
-    await tester.assert_save(
+    tester.assert_chat_data(
         {
             "users": {"@aaaa": {}},
             "active_users": ["@aaaa"],
@@ -71,7 +71,7 @@ async def test_open_game():
     )
     users = tester.chat.open_game()
     assert users == ["@aaa", "@bbb"]
-    await tester.assert_save(
+    tester.assert_chat_data(
         {
             "users": {},
             "active_users": ["@aaa", "@bbb"],
@@ -178,7 +178,7 @@ async def test_register_point():
         message_value=5,
     )
     tester.chat.register_point()
-    await tester.assert_save(
+    tester.assert_chat_data(
         {
             "users": {},
             "active_users": ["@aaa", "@bbb"],
@@ -204,7 +204,7 @@ async def test_register_point_with_parameters():
         message_value=5,
     )
     tester.chat.register_point(message_id=6666, value=6)
-    await tester.assert_save(
+    tester.assert_chat_data(
         {
             "users": {},
             "active_users": ["@aaa", "@bbb"],

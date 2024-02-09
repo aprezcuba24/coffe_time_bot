@@ -22,11 +22,14 @@ def _load_params(**kwargs):
     return update, context
 
 
-async def _assert_save(chat, data, context):
-    await chat.save()
+async def _assert_save(data, context):
     context.application.persistence.update_chat_data.assert_called_once_with(
         chat_id=1, data=data
     )
+
+
+def _assert_chat_data(chat, data):
+    assert chat.to_dict() == data
 
 
 def _assert_reply_text(update, **kwargs):
@@ -43,12 +46,14 @@ async def get_chat(data, **kwargs):
     context.application.persistence.get_chat_data = get_chat_data
     chat = await Chat.get_instance(update=update, context=context)
 
-    assert_save = lambda data: (
-        await _assert_save(chat, data, context) for _ in "_"
-    ).__anext__()
-    assert_reply_text = lambda **kwargs: (
-        await _assert_reply_text(update, **kwargs) for _ in "_"
-    ).__anext__()
+    async def assert_save(data):
+        await _assert_save(data, context)
+
+    def assert_chat_data(data):
+        _assert_chat_data(chat, data)
+
+    def assert_reply_text(**kwargs):
+        _assert_reply_text(update, **kwargs)
 
     Chat._instance = None
     tester = Object()
@@ -57,5 +62,6 @@ async def get_chat(data, **kwargs):
     tester.update = update
     tester.context = context
     tester.assert_save = assert_save
+    tester.assert_chat_data = assert_chat_data
 
     return tester

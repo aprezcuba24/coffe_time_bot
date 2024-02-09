@@ -1,29 +1,28 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 
-from app.services.chat import get_chat_item, remove_user
+from app.services.chat import Chat
 
 
-def validate(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def validate(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if len(context.args) != 1:
-        return update.effective_message.reply_text(text="Debe pasar solo un usuario.")
+        return await update.effective_message.reply_text(
+            text="Debe pasar solo un usuario."
+        )
     username = context.args[0]
     if not username.startswith("@"):
-        return update.effective_message.reply_text(
+        return await update.effective_message.reply_text(
             text=f'Este valor "{username}" no es un usuario válido.'
         )
 
 
 async def remove_user_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if validate(update=update, context=context) is not None:
+    if await validate(update=update, context=context) is not None:
         return
-    chat = update.effective_chat
-    chat_data = await get_chat_item(update, context)
+    chat = await Chat.get_instance(update, context)
     username = context.args[0]
-    chat_data = remove_user(username, chat_data)
-    await context.application.persistence.update_chat_data(
-        chat_id=chat.id, data=chat_data
-    )
+    chat.remove_user(username)
+    await chat.save()
     return await update.effective_message.reply_text(
         text=f"El usuario {username} fue eleminado."
     )

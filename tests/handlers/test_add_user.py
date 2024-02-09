@@ -30,9 +30,10 @@ async def test_complete():
     )
     await add_user_command(tester.update, tester.context)
     tester.assert_reply_text(text="Los usuarios fueron añadidos.")
-    tester.assert_save(
+    await tester.assert_save(
         {
             "users": {"@aaa": {"data": 1}, "@bbb": {}},
             "active_users": ["@aaa", "@bbb"],
+            "cycles": [],
         }
     )
