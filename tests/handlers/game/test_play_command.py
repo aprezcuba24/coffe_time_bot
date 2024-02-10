@@ -4,40 +4,38 @@ import pytest
 from telegram import InlineKeyboardMarkup
 
 from app.handlers.game import NO_BUTTON, YES_BUTTON, play_command
+from tests.util import get_chat
 
 
 @pytest.mark.asyncio
-@patch(
-    "app.services.chat.get_chat_item",
-    return_value={"cycles": [{}]},
-)
-async def test_has_open_game(*args):
-    update = AsyncMock()
-    context = AsyncMock()
-    await play_command(update, context)
-    update.effective_message.reply_text.assert_called_once_with(
+async def test_has_open_game():
+    tester = await get_chat(
+        {
+            "users": {"@aaa": {"data": 1}},
+            "active_users": ["@aaa"],
+            "cycles": [{"users": [], "points": {}}],
+        },
+    )
+    await play_command(tester.update, tester.context)
+    tester.assert_reply_text(
         reply_markup=InlineKeyboardMarkup([[YES_BUTTON, NO_BUTTON]]),
         text="Hay una partida abierta. ¿La quiere descartar?",
     )
 
 
 @pytest.mark.asyncio
-@patch(
-    "app.services.chat.get_chat_item",
-    return_value={"cycles": [], "active_users": ["@aaa", "@bbb"]},
-)
-async def test_no_has_open_game(*args):
-    update = AsyncMock()
-    update.effective_chat.id = 1
-    context = AsyncMock()
-    await play_command(update, context)
-    context.application.persistence.update_chat_data.assert_called_once_with(
-        chat_id=1,
+async def test_no_has_open_game():
+    tester = await get_chat(
+        {"users": {}, "active_users": ["@aaa", "@bbb"], "cycles": []},
+    )
+    await play_command(tester.update, tester.context)
+    await tester.assert_save(
         data={
+            "users": {},
             "cycles": [{"users": ["@aaa", "@bbb"], "points": {}}],
             "active_users": ["@aaa", "@bbb"],
         },
     )
-    update.effective_message.reply_text.assert_called_once_with(
+    tester.assert_reply_text(
         text="gogogogogogogogogogogogo \n @aaa @bbb",
     )
