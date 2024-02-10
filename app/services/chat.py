@@ -6,8 +6,14 @@ def start_params(users):
     return {"text": f"gogogogogogogogogogogogo \n {' '.join(users)}"}
 
 
-def the_winner(user):
-    return {"text": f"Tenemos un ganador {user}"}
+async def game_over_message(users, update: Update):
+    if len(users) == 1:
+        return await update.get_bot().send_message(
+            chat_id=update.effective_chat.id, text=f"Tenemos un ganador {users[0]}"
+        )
+    return await update.effective_message.reply_text(
+        text=f"Desempate {' '.join(users)}"
+    )
 
 
 class CycleItem:

@@ -1,18 +1,7 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 
-from app.services.chat import (
-    game_over,
-    has_open_game,
-    is_active_user,
-    is_the_last,
-    open_game,
-    register_point,
-    start_params,
-    the_winner,
-    user_can_dice,
-    user_has_dice,
-)
+from app.services.chat import Chat, game_over_message, start_params
 
 
 def get_buttons(message_id, value):
@@ -25,30 +14,30 @@ def get_buttons(message_id, value):
 
 
 async def dice_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not await is_active_user(update, context):
+    chat = await Chat.get_instance(update, context)
+    if not chat.is_active_user():
         return await update.effective_message.reply_text(
             text="Tu usuario no está activo. Adiciónalo primero."
         )
-    if not await has_open_game(update, context):
+    if not chat.has_open_game():
         buttons = get_buttons(update.effective_message.id, update.message.dice.value)
         return await update.effective_message.reply_text(
             reply_markup=InlineKeyboardMarkup([buttons]),
             text="No hay una partida abierta. ¿Quiere abrir una?",
         )
-    if await user_has_dice(update, context):
+    if chat.user_has_dice():
         return await update.effective_message.reply_text(
             text="Ya tiraste el dado.",
         )
-    if not await user_can_dice(update, context):
+    if not chat.user_can_dice():
         return await update.effective_message.reply_text(
             text="No puedes votar en esta ronda.",
         )
-    await register_point(update, context)
-    if await is_the_last(update, context):
-        users = await game_over(update, context)
-        await update.get_bot().send_message(
-            chat_id=update.effective_chat.id, **the_winner(users[0])
-        )
+    chat.register_point()
+    if chat.is_the_last_user():
+        users = chat.game_over()
+        await game_over_message(users, update)
+    await chat.save()
 
 
 def no_play_dice_query(update: Update, *args):
@@ -56,9 +45,10 @@ def no_play_dice_query(update: Update, *args):
 
 
 async def yes_play_dice_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if await has_open_game(update, context):
+    chat = await Chat.get_instance(update, context)
+    if chat.has_open_game():
         return
     parts = update.callback_query.data.split("/")
-    users = await open_game(update, context)
-    await register_point(update, context, int(parts[1]), int(parts[2]))
+    users = chat.open_game()
+    chat.register_point(int(parts[1]), int(parts[2]))
     return await update.effective_message.edit_text(**start_params(users))

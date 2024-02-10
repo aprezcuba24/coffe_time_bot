@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 
-from app.services.chat import game_over, the_winner
+from app.services.chat import game_over, game_over_message
 
 
 async def game_over_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -10,8 +10,4 @@ async def game_over_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return await update.effective_message.reply_text(
             text="No hay ningún juego abierto."
         )
-    if len(users) == 1:
-        return await update.effective_message.reply_text(**the_winner(users[0]))
-    return await update.effective_message.reply_text(
-        text=f"Desempate {' '.join(users)}"
-    )
+    await game_over_message(users, update)
