@@ -19,6 +19,8 @@ def _load_params(**kwargs):
         update.message.dice.value = kwargs["message_value"]
     if "args" in kwargs:
         context.args = kwargs["args"]
+    if "callback_query_data" in kwargs:
+        update.callback_query.data = kwargs["callback_query_data"]
     return update, context
 
 
@@ -36,6 +38,10 @@ def _assert_reply_text(update, **kwargs):
     update.effective_message.reply_text.assert_called_once_with(**kwargs)
 
 
+def _assert_edit_text(update, **kwargs):
+    update.effective_message.edit_text.assert_called_once_with(**kwargs)
+
+
 async def get_chat(data, **kwargs):
     data = data if data else {}
     update, context = _load_params(**kwargs)
@@ -44,6 +50,7 @@ async def get_chat(data, **kwargs):
         return {"1": data}
 
     context.application.persistence.get_chat_data = get_chat_data
+    Chat._instance = None
     chat = await Chat.get_instance(update=update, context=context)
 
     async def assert_save(data):
@@ -55,6 +62,9 @@ async def get_chat(data, **kwargs):
     def assert_reply_text(**kwargs):
         _assert_reply_text(update, **kwargs)
 
+    def assert_edit_text(**kwargs):
+        _assert_edit_text(update, **kwargs)
+
     Chat._instance = None
     tester = Object()
     tester.chat = chat
@@ -63,5 +73,6 @@ async def get_chat(data, **kwargs):
     tester.context = context
     tester.assert_save = assert_save
     tester.assert_chat_data = assert_chat_data
+    tester.assert_edit_text = assert_edit_text
 
     return tester

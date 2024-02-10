@@ -51,4 +51,5 @@ async def yes_play_dice_query(update: Update, context: ContextTypes.DEFAULT_TYPE
     parts = update.callback_query.data.split("/")
     users = chat.open_game()
     chat.register_point(int(parts[1]), int(parts[2]))
+    await chat.save()
     return await update.effective_message.edit_text(**start_params(users))

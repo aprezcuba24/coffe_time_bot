@@ -12,8 +12,7 @@ async def game_over_message(users, update: Update):
             chat_id=update.effective_chat.id, text=f"Tenemos un ganador {users[0]}"
         )
     return await update.get_bot().send_message(
-        chat_id=update.effective_chat.id,
-        text=f"Desempate {' '.join(users)}"
+        chat_id=update.effective_chat.id, text=f"Desempate {' '.join(users)}"
     )
 
 
