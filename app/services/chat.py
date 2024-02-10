@@ -11,7 +11,8 @@ async def game_over_message(users, update: Update):
         return await update.get_bot().send_message(
             chat_id=update.effective_chat.id, text=f"Tenemos un ganador {users[0]}"
         )
-    return await update.effective_message.reply_text(
+    return await update.get_bot().send_message(
+        chat_id=update.effective_chat.id,
         text=f"Desempate {' '.join(users)}"
     )
 
@@ -160,8 +161,3 @@ class Chat:
             self._users[user]["score"] = score + 1
             self._cycles = []
         return usernames
-
-
-# async def has_open_game(update: Update, context: ContextTypes.DEFAULT_TYPE):
-#     chat_data = await get_chat_item(update, context)
-#     return chat_data["cycles"] != []
