@@ -15,6 +15,10 @@ async def play_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text="Hay una partida abierta. ¿La quiere descartar?",
         )
     users = chat.open_game()
+    if len(users) == 0:
+        return await update.effective_message.reply_text(
+            text="Primero debe registrar usuarios."
+        )
     await chat.save()
     return await update.effective_message.reply_text(**start_params(users))
 

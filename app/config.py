@@ -14,6 +14,7 @@ async def configure(bot: telegram.Bot):
         ("play", "Comenzar nuevo juego."),
         ("add", "Adicionar usuario."),
         ("remove", "Eliminar usuario."),
+        ("gameOver", "Terminar partida"),
     ]
     await bot.set_my_commands(
         commands=common_commands, scope=telegram.BotCommandScopeAllGroupChats()

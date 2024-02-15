@@ -122,13 +122,11 @@ class DynamodbPersistence(BasePersistence):
             await self.dump_data()
 
     async def update_chat_data(self, chat_id: int, data: Dict) -> None:
+        item_id = str(chat_id)
         if not data:
             return
-        item_id = str(chat_id)
         if self.chat_data is None:
             self.chat_data = defaultdict(dict)
-        if self.chat_data.get(item_id) == data:
-            return
         self.chat_data[item_id] = data
         if not self.on_flush:
             await self.dump_data()

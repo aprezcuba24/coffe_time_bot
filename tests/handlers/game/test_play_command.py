@@ -39,3 +39,15 @@ async def test_no_has_open_game():
     tester.assert_reply_text(
         text="gogogogogogogogogogogogo \n @aaa @bbb",
     )
+
+
+@pytest.mark.asyncio
+async def test_no_has_open_game():
+    tester = await get_chat(
+        {"users": {}, "active_users": [], "cycles": []},
+    )
+    await play_command(tester.update, tester.context)
+    tester.context.application.persistence.update_chat_data.assert_not_called()
+    tester.assert_reply_text(
+        text="Primero debe registrar usuarios.",
+    )
