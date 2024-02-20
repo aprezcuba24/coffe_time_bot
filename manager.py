@@ -30,7 +30,7 @@ main(
     {
         "version": "2.0",
         "routeKey": "$default",
-        "rawPath": "/webhook",
+        "rawPath": "/register-bot",
         "rawQueryString": "",
         "headers": {
             "content-length": "410",
