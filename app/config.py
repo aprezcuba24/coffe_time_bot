@@ -1,5 +1,11 @@
 import telegram
-from telegram.ext import CallbackQueryHandler, CommandHandler, MessageHandler, filters
+from telegram.ext import (
+    Application,
+    CallbackQueryHandler,
+    CommandHandler,
+    MessageHandler,
+    filters,
+)
 
 from app.handlers.add_user import add_user_command
 from app.handlers.dice import dice_handler, no_play_dice_query, yes_play_dice_query
@@ -27,7 +33,7 @@ async def configure(bot: telegram.Bot):
     )
 
 
-def configure_handlers(application):
+def configure_handlers(application: Application):
     application.add_handler(CommandHandler(command="start", callback=start_command))
     application.add_handler(CommandHandler(command="add", callback=add_user_command))
     application.add_handler(
