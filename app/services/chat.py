@@ -61,14 +61,11 @@ class CycleItem:
 
 
 class Chat:
-    _instance = None
-
     @classmethod
     async def get_instance(cls, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        if cls._instance is None:
-            cls._instance = Chat(update=update, context=context)
-            await cls._instance._load_data()
-        return cls._instance
+        instance = Chat(update=update, context=context)
+        await instance._load_data()
+        return instance
 
     def __init__(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         self._update = update

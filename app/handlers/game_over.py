@@ -11,4 +11,5 @@ async def game_over_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return await update.effective_message.reply_text(
             text="No hay ningún juego abierto."
         )
+    await chat.save()
     await game_over_message(users, update)

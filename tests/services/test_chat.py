@@ -120,6 +120,24 @@ async def test_user_has_dice_has():
 
 
 @pytest.mark.asyncio
+async def test_user_has_dice_other_user():
+    tester = await get_chat(
+        {
+            "users": {"@aaa": {}, "@bbb": {}},
+            "active_users": ["@aaa", "@bbb"],
+            "cycles": [
+                {
+                    "users": ["@aaa", "@bbb"],
+                    "points": {"@bbb": {"message_id": 7641, "value": 5}},
+                }
+            ],
+        },
+        username="aaa",
+    )
+    assert not tester.chat.user_has_dice()
+
+
+@pytest.mark.asyncio
 async def test_user_can_dice_no():
     tester = await get_chat(
         {
