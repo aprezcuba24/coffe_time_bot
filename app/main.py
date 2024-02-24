@@ -1,55 +1,60 @@
+import asyncio
 import json
 import os
-from telegram import Update, Bot
-from telegram.ext import ContextTypes
-from queue import Queue
+import traceback
 
-from app.utils.callback_context import CallbackContext
+from telegram import Bot, Update
+from telegram.ext import Application
+
 from app.config import configure, configure_handlers
-from app.utils.dispatcher import Dispatcher
+from app.utils.persistence import DynamodbPersistence
 
 
-def main(event, context):
-    print(event)
-    TELEGRAM_TOKEN = os.environ.get('TELEGRAM_TOKEN')
-    bot = Bot(token=TELEGRAM_TOKEN)
+def main(event, *args, **kwargs):
+    TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
+    application = (
+        Application.builder()
+        .token(TELEGRAM_TOKEN)
+        .persistence(DynamodbPersistence())
+        .build()
+    )
     routes = {
         "/webhook": webhook,
         "/register-bot": register_bot,
     }
     func = routes.get(event["rawPath"], not_found)
-    return func(event, bot)
+    return asyncio.get_event_loop().run_until_complete(func(event, application))
 
 
-def not_found(event, *args):
+async def not_found(event, *args):
     return {
         "statusCode": 404,
         "body": "Not found",
     }
 
 
-def webhook(event, bot: Bot):
-    data = json.loads(event["body"])
-    update = Update.de_json(data, bot)
-    dispatcher = Dispatcher(bot=bot, update_queue=Queue(), context_types=ContextTypes(context=CallbackContext))
-    configure_handlers(dispatcher)
-    dispatcher.process_update(update=update)
-    return {
-        "statusCode": 200,
-        "body": "ok"
-    }
+async def webhook(event, application: Application):
+    configure_handlers(application)
+    try:
+        await application.initialize()
+        await application.process_update(
+            Update.de_json(json.loads(event["body"]), application.bot)
+        )
+
+        return {"statusCode": 200, "body": "Success"}
+
+    except Exception as exc:
+        print("webhook =>", "Exception")
+        print(exc)
+        print(traceback.format_exc())
+        return {"statusCode": 500, "body": "Failure"}
 
 
-def register_bot(event, bot: Bot):
+async def register_bot(event, application: Application):
     url = f"https://{event['requestContext']['domainName']}/webhook"
-    bot.setWebhook(url)
-    body = {
-        "webhook_url": url,
-        "bot": bot.get_me().to_dict(),
-        "input": event
-    }
-    configure(bot)
-    return {
-        "statusCode": 200,
-        "body": json.dumps(body)
-    }
+    bot: Bot = application.bot
+    await bot.set_webhook(url)
+    bot_user = await bot.get_me()
+    body = {"webhook_url": url, "bot": bot_user.to_dict(), "input": event}
+    await configure(bot=bot)
+    return {"statusCode": 200, "body": json.dumps(body)}

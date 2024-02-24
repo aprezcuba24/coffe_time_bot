@@ -17,7 +17,7 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource:
-        'Fn::GetAtt': ['UsersTable', 'Arn']
+        - { 'Fn::GetAtt': ['PersistenceTable', 'Arn']}
     - Effect: Allow
       Action:
         - logs:*
@@ -34,7 +34,8 @@ provider:
     REGION: us-east-1
     USER_TABLE: ${self:custom.user_table}
     BOT_NAME: ${self:custom.bot_name}
-    MAIN_LOG_GROUP: /aws/lambda/coffee-time-bot-${env:stage}-main
+    PERSISTENCE_TABLE: ${self:custom.bot_data_table}
+    MAIN_LOG_GROUP: /aws/lambda/coffe-time-bot-${env:stage}-main
 
 package:
  patterns:
@@ -44,8 +45,9 @@ package:
 custom:
   pythonRequirements:
     dockerizePip: non-linux
-  user_table: ${env:stage}_coffee-time-bot_users_table
-  bot_name: ${env:stage}_coffee-time-bot
+  user_table: ${env:stage}-coffe-time-bot_users_table
+  bot_data_table: ${env:stage}-coffe-time-bot_persistence_data_table
+  bot_name: ${env:stage}_coffe-time-bot
 
 plugins:
   - serverless-python-requirements
@@ -58,16 +60,4 @@ functions:
 
 resources:
   Resources:
-    UsersTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${self:custom.user_table}
-        AttributeDefinitions:
-          - AttributeName: user_id
-            AttributeType: S
-        KeySchema:
-          - AttributeName: user_id
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+    ${file(resources/dynamodb.yml)}
