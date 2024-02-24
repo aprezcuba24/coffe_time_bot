@@ -24,9 +24,10 @@ async def test_no_has_open_game():
         message_id=5555,
         message_value=1,
         username="aaa",
+        user_id=111,
     )
     await dice_handler(tester.update, tester.context)
-    buttons = get_buttons(5555, 1)
+    buttons = get_buttons(111, 5555, 1)
     tester.assert_reply_text(
         reply_markup=InlineKeyboardMarkup([buttons]),
         text="No hay una partida abierta. ¿Quiere abrir una?",

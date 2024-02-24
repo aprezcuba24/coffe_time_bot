@@ -21,6 +21,8 @@ def _load_params(**kwargs):
         context.args = kwargs["args"]
     if "callback_query_data" in kwargs:
         update.callback_query.data = kwargs["callback_query_data"]
+    if "user_id" in kwargs:
+        update.effective_user.id = kwargs["user_id"]
     return update, context
 
 

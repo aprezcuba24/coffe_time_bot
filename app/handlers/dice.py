@@ -4,10 +4,10 @@ from telegram.ext import ContextTypes
 from app.services.chat import Chat, game_over_message, start_params
 
 
-def get_buttons(message_id, value):
+def get_buttons(user_id, message_id, value):
     YES_BUTTON = InlineKeyboardButton(
         text="Si",
-        callback_data=f"dice_yes_play/{message_id}/{value}",
+        callback_data=f"dice_yes_play/{user_id}/{message_id}/{value}",
     )
     NO_BUTTON = InlineKeyboardButton(text="No", callback_data="dice_no_play")
     return [YES_BUTTON, NO_BUTTON]
@@ -20,7 +20,11 @@ async def dice_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text="Tu usuario no está activo. Adiciónalo primero."
         )
     if not chat.has_open_game():
-        buttons = get_buttons(update.effective_message.id, update.message.dice.value)
+        buttons = get_buttons(
+            update.effective_user.id,
+            update.effective_message.id,
+            update.message.dice.value,
+        )
         return await update.effective_message.reply_text(
             reply_markup=InlineKeyboardMarkup([buttons]),
             text="No hay una partida abierta. ¿Quiere abrir una?",
@@ -48,8 +52,11 @@ async def yes_play_dice_query(update: Update, context: ContextTypes.DEFAULT_TYPE
     chat = await Chat.get_instance(update, context)
     if chat.has_open_game():
         return
-    parts = update.callback_query.data.split("/")
+    [_, user_id, message_id, value] = update.callback_query.data.split("/")
+    print(user_id, message_id, value)
+    if update.effective_user.id != int(user_id):
+        return
     users = chat.open_game()
-    chat.register_point(int(parts[1]), int(parts[2]))
+    chat.register_point(int(message_id), int(value))
     await chat.save()
     return await update.effective_message.edit_text(**start_params(users))
