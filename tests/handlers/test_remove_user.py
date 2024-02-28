@@ -40,6 +40,7 @@ async def test_complete():
     tester.assert_reply_text(text="El usuario @bbb fue eleminado.")
     await tester.assert_save(
         {
+            "last_play_date": None,
             "users": {"@aaa": {"data": 1}, "@bbb": {}},
             "active_users": ["@aaa"],
             "cycles": [],

@@ -1,7 +1,9 @@
 from collections import defaultdict
+from datetime import datetime
 
 import pytest
 
+from app.services.chat import date_format
 from tests.util import get_chat
 
 
@@ -11,6 +13,7 @@ async def test_add_user_it_there():
     tester.chat.add_user("@bbb")
     tester.assert_chat_data(
         {
+            "last_play_date": None,
             "users": {"@aaa": {}, "@bbb": {}},
             "active_users": ["@aaa", "@bbb"],
             "cycles": [],
@@ -28,14 +31,21 @@ async def test_remove_user():
     )
     tester.chat.remove_user("@bbb")
     tester.assert_chat_data(
-        {"users": {"@aaa": {}, "@bbb": {}}, "active_users": ["@aaa"], "cycles": []}
+        {
+            "last_play_date": None,
+            "users": {"@aaa": {}, "@bbb": {}},
+            "active_users": ["@aaa"],
+            "cycles": [],
+        }
     )
 
 
 @pytest.mark.asyncio
 async def test_get_chat_item_not_chat():
     tester = await get_chat(defaultdict(dict, {}))
-    tester.assert_chat_data({"users": {}, "active_users": [], "cycles": []})
+    tester.assert_chat_data(
+        {"last_play_date": None, "users": {}, "active_users": [], "cycles": []}
+    )
 
 
 @pytest.mark.asyncio
@@ -45,6 +55,7 @@ async def test_get_chat_item_has_chat():
     )
     tester.assert_chat_data(
         {
+            "last_play_date": None,
             "users": {"@aaaa": {}},
             "active_users": ["@aaaa"],
             "cycles": [],
@@ -73,6 +84,7 @@ async def test_open_game():
     assert users == ["@aaa", "@bbb"]
     tester.assert_chat_data(
         {
+            "last_play_date": datetime.now().strftime(date_format),
             "users": {},
             "active_users": ["@aaa", "@bbb"],
             "cycles": [{"users": ["@aaa", "@bbb"], "points": {}}],
@@ -198,6 +210,7 @@ async def test_register_point():
     tester.chat.register_point()
     tester.assert_chat_data(
         {
+            "last_play_date": None,
             "users": {},
             "active_users": ["@aaa", "@bbb"],
             "cycles": [
@@ -224,6 +237,7 @@ async def test_register_point_with_parameters():
     tester.chat.register_point(message_id=6666, value=6)
     tester.assert_chat_data(
         {
+            "last_play_date": None,
             "users": {},
             "active_users": ["@aaa", "@bbb"],
             "cycles": [

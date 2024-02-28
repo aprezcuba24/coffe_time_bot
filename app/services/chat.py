@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from telegram import Update
 from telegram.ext import ContextTypes
 
@@ -66,6 +68,9 @@ class CycleItem:
         return len(self._users) == len(self._points)
 
 
+date_format = "%m/%d/%Y %I:%M %p"
+
+
 class Chat:
     @classmethod
     async def get_instance(cls, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -82,12 +87,21 @@ class Chat:
         chat = self._update.effective_chat
         chats = await self._context.application.persistence.get_chat_data()
         chat_data = chats[str(chat.id)]
+        last_play_date = chat_data.get("last_play_date")
+        self._last_play_date = (
+            datetime.strptime(last_play_date, date_format) if last_play_date else None
+        )
         self._users = chat_data.get("users", {})
         self._active_users = chat_data.get("active_users", [])
         self._cycles = [CycleItem.load(item) for item in chat_data.get("cycles", [])]
 
     def to_dict(self):
         return {
+            "last_play_date": (
+                self._last_play_date.strftime(date_format)
+                if self._last_play_date
+                else None
+            ),
             "users": self._users,
             "active_users": self._active_users,
             "cycles": [item.to_dict() for item in self._cycles],
@@ -111,6 +125,7 @@ class Chat:
         return self._cycles != []
 
     def open_game(self):
+        self._last_play_date = datetime.now()
         self._cycles = [CycleItem(self._active_users)]
         return self._active_users
 
