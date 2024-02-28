@@ -2,6 +2,12 @@ from telegram import Update
 from telegram.ext import ContextTypes
 
 
+async def user_not_active(update):
+    return await update.effective_message.reply_text(
+        text="Tu usuario no está activo. Adiciónalo primero."
+    )
+
+
 def start_params(users):
     return {"text": f"gogogogogogogogogogogogo \n {' '.join(users)}"}
 

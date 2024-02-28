@@ -1,7 +1,7 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 
-from app.services.chat import Chat, game_over_message, start_params
+from app.services.chat import Chat, game_over_message, start_params, user_not_active
 
 
 def get_buttons(user_id, message_id, value):
@@ -16,9 +16,7 @@ def get_buttons(user_id, message_id, value):
 async def dice_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = await Chat.get_instance(update, context)
     if not chat.is_active_user():
-        return await update.effective_message.reply_text(
-            text="Tu usuario no está activo. Adiciónalo primero."
-        )
+        return await user_not_active(update)
     if not chat.has_open_game():
         buttons = get_buttons(
             update.effective_user.id,

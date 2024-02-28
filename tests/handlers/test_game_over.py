@@ -7,8 +7,19 @@ from tests.util import get_chat
 
 
 @pytest.mark.asyncio
+async def test_user_no_active():
+    tester = await get_chat(
+        {"users": {"@aaa": {"data": 1}}, "active_users": ["@aaa"]}, username="bbb"
+    )
+    assert await game_over_command(tester.update, tester.context)
+    tester.assert_reply_text(text="Tu usuario no está activo. Adiciónalo primero.")
+
+
+@pytest.mark.asyncio
 async def test_no_open_game():
-    tester = await get_chat({"users": {"@aaa": {"data": 1}}, "active_users": ["@aaa"]})
+    tester = await get_chat(
+        {"users": {"@aaa": {"data": 1}}, "active_users": ["@aaa"]}, username="aaa"
+    )
     assert await game_over_command(tester.update, tester.context)
     tester.assert_reply_text(text="No hay ningún juego abierto.")
 
@@ -28,7 +39,8 @@ async def test_has_a_winner():
                     },
                 }
             ],
-        }
+        },
+        username="aaa",
     )
     bot = AsyncMock()
     tester.update.get_bot = lambda: bot
@@ -52,7 +64,8 @@ async def test_a_new_cycle():
                     },
                 }
             ],
-        }
+        },
+        username="aaa",
     )
     bot = AsyncMock()
     tester.update.get_bot = lambda: bot

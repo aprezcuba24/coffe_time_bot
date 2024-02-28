@@ -15,6 +15,7 @@ async def test_has_open_game():
             "active_users": ["@aaa"],
             "cycles": [{"users": [], "points": {}}],
         },
+        username="aaa",
     )
     await play_command(tester.update, tester.context)
     tester.assert_reply_text(
@@ -26,7 +27,7 @@ async def test_has_open_game():
 @pytest.mark.asyncio
 async def test_no_has_open_game():
     tester = await get_chat(
-        {"users": {}, "active_users": ["@aaa", "@bbb"], "cycles": []},
+        {"users": {}, "active_users": ["@aaa", "@bbb"], "cycles": []}, username="aaa"
     )
     await play_command(tester.update, tester.context)
     await tester.assert_save(
@@ -49,5 +50,5 @@ async def test_no_has_open_game():
     await play_command(tester.update, tester.context)
     tester.context.application.persistence.update_chat_data.assert_not_called()
     tester.assert_reply_text(
-        text="Primero debe registrar usuarios.",
+        text="Tu usuario no está activo. Adiciónalo primero.",
     )
