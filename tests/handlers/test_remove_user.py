@@ -1,5 +1,3 @@
-from unittest.mock import AsyncMock, MagicMock, patch
-
 import pytest
 
 from app.handlers.remove_user import remove_user_command

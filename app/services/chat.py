@@ -68,28 +68,18 @@ class CycleItem:
         return len(self._users) == len(self._points)
 
 
-date_format = "%m/%d/%Y %I:%M %p"
+class ChatItem:
+    def __init__(self, chat_id):
+        self.chat_id = chat_id
 
+    @property
+    def active_users(self):
+        return self._active_users
 
-class Chat:
-    @classmethod
-    async def get_instance(cls, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        instance = Chat(update=update, context=context)
-        await instance._load_data()
-        return instance
-
-    def __init__(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        self._update = update
-        self._context = context
-        self._active_username = f"@{self._update.effective_user.username}"
-
-    async def _load_data(self):
-        chat = self._update.effective_chat
-        chats = await self._context.application.persistence.get_chat_data()
-        chat_data = chats[str(chat.id)]
+    def load_data(self, chat_data):
         last_play_date = chat_data.get("last_play_date")
         self._last_play_date = (
-            datetime.strptime(last_play_date, date_format) if last_play_date else None
+            datetime.fromisoformat(last_play_date) if last_play_date else None
         )
         self._users = chat_data.get("users", {})
         self._active_users = chat_data.get("active_users", [])
@@ -98,7 +88,7 @@ class Chat:
     def to_dict(self):
         return {
             "last_play_date": (
-                self._last_play_date.strftime(date_format)
+                self._last_play_date.isoformat(timespec="minutes")
                 if self._last_play_date
                 else None
             ),
@@ -106,11 +96,6 @@ class Chat:
             "active_users": self._active_users,
             "cycles": [item.to_dict() for item in self._cycles],
         }
-
-    async def save(self):
-        await self._context.application.persistence.update_chat_data(
-            chat_id=self._update.effective_chat.id, data=self.to_dict()
-        )
 
     def add_user(self, username):
         if username not in self._users:
@@ -129,36 +114,13 @@ class Chat:
         self._cycles = [CycleItem(self._active_users)]
         return self._active_users
 
-    def is_active_user(self):
-        return self._active_username in self._active_users
-
     def _get_last_cycle(self) -> CycleItem:
         return self._cycles[-1]
-
-    def _user_has_dice(self):
-        return self._get_last_cycle().has_dice(self._active_username)
 
     def user_has_dice(self):
         if not self.has_open_game():
             return False
         return self._user_has_dice()
-
-    def user_can_dice(self):
-        return not self._user_has_dice() and self._get_last_cycle().has_user(
-            self._active_username
-        )
-
-    def register_point(self, message_id=None, value=None):
-        if not self.has_open_game():
-            return False
-        if self._user_has_dice():
-            return False
-        message_id = (
-            message_id if message_id is not None else self._update.effective_message.id
-        )
-        value = value if value is not None else self._update.message.dice.value
-        last_cycle: CycleItem = self._get_last_cycle()
-        last_cycle.add_point(self._active_username, message_id, value)
 
     def is_the_last_user(self):
         return self._get_last_cycle().is_completed()
@@ -178,3 +140,50 @@ class Chat:
             self._users[user]["score"] = score + 1
             self._cycles = []
         return usernames
+
+
+class Chat(ChatItem):
+    @classmethod
+    async def get_instance(cls, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        instance = Chat(update=update, context=context)
+        chat = update.effective_chat
+        chats = await context.application.persistence.get_chat_data()
+        chat_data = chats[str(chat.id)]
+        instance.load_data(chat_data)
+        return instance
+
+    def __init__(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        super().__init__(
+            update.effective_chat.id,
+        )
+        self._active_username = f"@{update.effective_user.username}"
+        self.message_id = update.effective_message.id
+        self.dice_value = update.message.dice.value if update.message.dice else 0
+        self._update = update
+        self._context = context
+
+    async def save(self):
+        await self._context.application.persistence.update_chat_data(
+            chat_id=self.chat_id, data=self.to_dict()
+        )
+
+    def register_point(self, message_id=None, value=None):
+        if not self.has_open_game():
+            return False
+        if self._user_has_dice():
+            return False
+        message_id = message_id if message_id is not None else self.message_id
+        value = value if value is not None else self.dice_value
+        last_cycle: CycleItem = self._get_last_cycle()
+        last_cycle.add_point(self._active_username, message_id, value)
+
+    def is_active_user(self):
+        return self._active_username in self._active_users
+
+    def _user_has_dice(self):
+        return self._get_last_cycle().has_dice(self._active_username)
+
+    def user_can_dice(self):
+        return not self._user_has_dice() and self._get_last_cycle().has_user(
+            self._active_username
+        )

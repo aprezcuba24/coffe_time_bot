@@ -3,7 +3,6 @@ from datetime import datetime
 import pytest
 
 from app.handlers.game import play_yes_query
-from app.services.chat import date_format
 from tests.util import get_chat
 
 
@@ -19,7 +18,7 @@ async def test_yes():
     await play_yes_query(tester.update, tester.context)
     await tester.assert_save(
         {
-            "last_play_date": datetime.now().strftime(date_format),
+            "last_play_date": datetime.now().isoformat(timespec="minutes"),
             "users": {},
             "cycles": [{"users": ["@aaa", "@bbb"], "points": {}}],
             "active_users": ["@aaa", "@bbb"],

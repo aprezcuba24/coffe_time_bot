@@ -3,7 +3,6 @@ from datetime import datetime
 
 import pytest
 
-from app.services.chat import date_format
 from tests.util import get_chat
 
 
@@ -84,7 +83,7 @@ async def test_open_game():
     assert users == ["@aaa", "@bbb"]
     tester.assert_chat_data(
         {
-            "last_play_date": datetime.now().strftime(date_format),
+            "last_play_date": datetime.now().isoformat(timespec="minutes"),
             "users": {},
             "active_users": ["@aaa", "@bbb"],
             "cycles": [{"users": ["@aaa", "@bbb"], "points": {}}],

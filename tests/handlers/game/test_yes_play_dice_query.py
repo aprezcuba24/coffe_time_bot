@@ -3,7 +3,6 @@ from datetime import datetime
 import pytest
 
 from app.handlers.dice import yes_play_dice_query
-from app.services.chat import date_format
 from tests.util import get_chat
 
 
@@ -52,7 +51,7 @@ async def test_new_game():
     )
     await tester.assert_save(
         {
-            "last_play_date": datetime.now().strftime(date_format),
+            "last_play_date": datetime.now().isoformat(timespec="minutes"),
             "users": {},
             "active_users": ["@aaa", "@bbb"],
             "cycles": [

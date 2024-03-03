@@ -1,5 +1,3 @@
-from unittest.mock import AsyncMock, MagicMock, patch
-
 import pytest
 
 from app.handlers.add_user import add_user_command
