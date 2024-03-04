@@ -21,7 +21,7 @@ async def test_no_open_game():
         {"users": {"@aaa": {"data": 1}}, "active_users": ["@aaa"]}, username="aaa"
     )
     assert await game_over_command(tester.update, tester.context)
-    tester.assert_reply_text(text="No hay ningún juego abierto.")
+    tester.assert_reply_text(text="No hay ningún juego abierto o no se llegó a jugar.")
 
 
 @pytest.mark.asyncio
@@ -71,3 +71,24 @@ async def test_a_new_cycle():
     tester.update.get_bot = lambda: bot
     await game_over_command(tester.update, tester.context)
     bot.send_message.assert_called_once_with(chat_id=1, text="Desempate @aaa @bbb")
+
+
+@pytest.mark.asyncio
+async def test_no_dice():
+    tester = await get_chat(
+        {
+            "users": {"@aaa": {"data": 1}, "@bbb": {}, "@ccc": {}},
+            "active_users": ["@aaa", "@bbb", "@ccc"],
+            "cycles": [
+                {
+                    "users": ["@aaa", "@bbb", "@ccc"],
+                    "points": {},
+                }
+            ],
+        },
+        username="aaa",
+    )
+    bot = AsyncMock()
+    tester.update.get_bot = lambda: bot
+    await game_over_command(tester.update, tester.context)
+    tester.assert_reply_text(text="No hay ningún juego abierto o no se llegó a jugar.")

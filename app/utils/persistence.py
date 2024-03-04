@@ -1,11 +1,16 @@
 import json
+import os
 from collections import defaultdict
 from copy import deepcopy
 from typing import Any, DefaultDict, Dict, Optional, Tuple
 
+import boto3
 from telegram.ext import BasePersistence, PersistenceInput
 
-from app.services.persistence_data import get_persistence_data, save_data
+region = os.environ.get("REGION")
+dynamodb = boto3.resource("dynamodb", region_name=region)
+PERSISTENCE_TABLE = os.environ.get("PERSISTENCE_TABLE")
+RECORD_ID = "TELEGRAM_CHAT_DATA"
 
 
 class DynamodbPersistence(BasePersistence):
@@ -24,8 +29,14 @@ class DynamodbPersistence(BasePersistence):
         self.bot_data: Optional[Dict] = None
         self.conversations: Optional[Dict[str, Dict[Tuple, Any]]] = None
 
+    async def get_persistence_data(self):
+        table = dynamodb.Table(PERSISTENCE_TABLE)
+        Key = {"persistence_id": RECORD_ID}
+        item = table.get_item(Key=Key)
+        return item.get("Item", None)
+
     async def load_data(self) -> None:
-        data = await get_persistence_data()
+        data = await self.get_persistence_data()
         if data:
             self.user_data = defaultdict(dict, json.loads(data["user_data"]))
             self.chat_data = defaultdict(dict, json.loads(data["chat_data"]))
@@ -41,15 +52,16 @@ class DynamodbPersistence(BasePersistence):
             self.bot_data = {}
 
     async def dump_data(self) -> None:
-        return await save_data(
-            {
-                "conversations": json.dumps(self.conversations),
-                "user_data": json.dumps(self.user_data),
-                "chat_data": json.dumps(self.chat_data),
-                "bot_data": json.dumps(self.bot_data),
-                "callback_data": json.dumps(self.callback_data),
-            }
-        )
+        data = {
+            "persistence_id": RECORD_ID,
+            "conversations": json.dumps(self.conversations),
+            "user_data": json.dumps(self.user_data),
+            "chat_data": json.dumps(self.chat_data),
+            "bot_data": json.dumps(self.bot_data),
+            "callback_data": json.dumps(self.callback_data),
+        }
+        table = dynamodb.Table(PERSISTENCE_TABLE)
+        table.put_item(Item=data)
 
     async def get_user_data(self) -> DefaultDict[int, Dict[Any, Any]]:
         if self.user_data:

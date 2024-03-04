@@ -140,7 +140,9 @@ class ChatItem:
             return None
         last_cycle: CycleItem = self._get_last_cycle()
         usernames = last_cycle.get_users_by_score()
-        if len(usernames) > 1:
+        if len(usernames) == 0:
+            self._cycles = []
+        elif len(usernames) > 1:
             self._cycles.append(CycleItem(users=usernames))
         else:
             user = usernames[0]

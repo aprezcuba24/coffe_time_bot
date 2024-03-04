@@ -51,7 +51,6 @@ async def yes_play_dice_query(update: Update, context: ContextTypes.DEFAULT_TYPE
     if chat.has_open_game():
         return
     [_, user_id, message_id, value] = update.callback_query.data.split("/")
-    print(user_id, message_id, value)
     if update.effective_user.id != int(user_id):
         return
     users = chat.open_game()
