@@ -59,12 +59,9 @@ functions:
     url: true
   schedule:
     handler: app/schedule.main
-    # If you change the hour see the value of HOURS_DIFFERENCE in this file app/schedule.py
     events:
-      # # -5 hours difference from UTC
-      # - schedule: cron(0 30 4 ? * MON-FRI)
-      # - schedule: cron(0 0 8 ? * MON-FRI)
-      - schedule: cron(25 3 ? * MON-FRI *)
+      # If you change the hour see the value of HOURS_DIFFERENCE in this file app/schedule.py
+      # -5 hours difference from UTC
       - schedule: cron(30 14 ? * MON-FRI *)
       - schedule: cron(30 18 ? * MON-FRI *)
 
