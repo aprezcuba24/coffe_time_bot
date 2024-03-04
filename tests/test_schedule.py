@@ -1,6 +1,6 @@
-import datetime
 import json
-from unittest.mock import patch
+from datetime import datetime
+from unittest.mock import AsyncMock, patch
 
 import pytest
 
@@ -44,37 +44,59 @@ def get_persisted_data(last_play_date=None):
 
 
 @pytest.mark.asyncio
-@patch("app.schedule.get_persistence_data", return_value=None)
-async def test_no_chat_data(*args):
+@patch("app.schedule.application.persistence.get_chat_data", return_value=None)
+@patch("app.schedule.open_game_by_schedule")
+async def test_no_chat_data(open_game_by_schedule, *args):
     data = await main(get_data())
     assert data["body"] == "no_chat"
+    open_game_by_schedule.assert_not_called()
 
 
 @pytest.mark.asyncio
 @patch(
-    "app.schedule.get_persistence_data",
+    "app.schedule.application.persistence.get_chat_data",
     return_value=get_persisted_data("2024-03-03T18:40"),
 )
-@patch("app.schedule.open_game_by_schedule")
-async def test_not_called_today(open_game_by_schedule, *args):
+@patch("app.schedule.application.persistence.update_chat_data")
+@patch("app.schedule.send_message")
+async def test_not_called_today(send_message, update_chat_data, *args):
     await main(get_data("2024-03-02T18:30:00Z"))
-    open_game_by_schedule.assert_called_once()
+    update_chat_data.assert_called_once_with(
+        chat_id="-1001215010172",
+        data={
+            "last_play_date": datetime.now().isoformat(timespec="minutes"),
+            "users": {"@renierricardo": {}},
+            "active_users": ["@renierricardo"],
+            "cycles": [{"users": ["@renierricardo"], "points": {}}],
+        },
+    )
+    send_message.assert_called_once_with("-1001215010172", ["@renierricardo"])
 
 
 @pytest.mark.asyncio
 @patch(
-    "app.schedule.get_persistence_data",
+    "app.schedule.application.persistence.get_chat_data",
     return_value=get_persisted_data("2024-03-03T18:40"),
 )
-@patch("app.schedule.open_game_by_schedule")
-async def test_not_called_in_the_afternoon(open_game_by_schedule, *args):
+@patch("app.schedule.application.persistence.update_chat_data")
+@patch("app.schedule.send_message")
+async def test_not_called_in_the_afternoon(send_message, update_chat_data, *args):
     await main(get_data("2024-03-03T14:30:00Z"))
-    open_game_by_schedule.assert_called_once()
+    update_chat_data.assert_called_once_with(
+        chat_id="-1001215010172",
+        data={
+            "last_play_date": datetime.now().isoformat(timespec="minutes"),
+            "users": {"@renierricardo": {}},
+            "active_users": ["@renierricardo"],
+            "cycles": [{"users": ["@renierricardo"], "points": {}}],
+        },
+    )
+    send_message.assert_called_once_with("-1001215010172", ["@renierricardo"])
 
 
 @pytest.mark.asyncio
 @patch(
-    "app.schedule.get_persistence_data",
+    "app.schedule.application.persistence.get_chat_data",
     return_value=get_persisted_data("2024-03-03T14:40"),
 )
 @patch("app.schedule.open_game_by_schedule")
@@ -85,7 +107,7 @@ async def test_was_already_called_in_the_morning(open_game_by_schedule, *args):
 
 @pytest.mark.asyncio
 @patch(
-    "app.schedule.get_persistence_data",
+    "app.schedule.application.persistence.get_chat_data",
     return_value=get_persisted_data("2024-03-03T18:40"),
 )
 @patch("app.schedule.open_game_by_schedule")
