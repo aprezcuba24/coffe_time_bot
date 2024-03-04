@@ -67,6 +67,9 @@ class CycleItem:
     def is_completed(self):
         return len(self._users) == len(self._points)
 
+    def who_are_left(self):
+        return [item for item in self._users if item not in self._points]
+
 
 class ChatItem:
     def __init__(self, chat_id, persistence):
@@ -152,6 +155,11 @@ class ChatItem:
             self._users[user]["score"] = score + 1
             self._cycles = []
         return usernames
+
+    def who_are_left(self):
+        if not self.has_open_game():
+            return None
+        return self._get_last_cycle().who_are_left()
 
 
 class Chat(ChatItem):

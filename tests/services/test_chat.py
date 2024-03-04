@@ -269,3 +269,36 @@ async def test_is_the_last():
         },
     )
     assert tester.chat.is_the_last_user()
+
+
+@pytest.mark.asyncio
+async def test_who_are_left_no_open_game():
+    tester = await get_chat(
+        {
+            "active_users": ["@aaa", "@bbb"],
+            "cycles": [],
+        },
+    )
+    assert tester.chat.who_are_left() == None
+
+
+@pytest.mark.asyncio
+async def test_who_are_left_all():
+    tester = await get_chat(
+        {
+            "active_users": ["@aaa", "@bbb"],
+            "cycles": [{"users": ["@aaa", "@bbb"], "points": {}}],
+        },
+    )
+    assert tester.chat.who_are_left() == ["@aaa", "@bbb"]
+
+
+@pytest.mark.asyncio
+async def test_who_are_left_one():
+    tester = await get_chat(
+        {
+            "active_users": ["@aaa", "@bbb"],
+            "cycles": [{"users": ["@aaa", "@bbb"], "points": {"@aaa": {}}}],
+        },
+    )
+    assert tester.chat.who_are_left() == ["@bbb"]

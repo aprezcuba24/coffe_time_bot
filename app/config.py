@@ -13,6 +13,7 @@ from app.handlers.game import play_command, play_no_query, play_yes_query
 from app.handlers.game_over import game_over_command
 from app.handlers.remove_user import remove_user_command
 from app.handlers.start import start_command, start_query
+from app.handlers.who_are_left import who_are_left_command
 
 
 async def configure(bot: telegram.Bot):
@@ -21,6 +22,7 @@ async def configure(bot: telegram.Bot):
         ("add", "Adicionar usuario."),
         ("remove", "Eliminar usuario."),
         ("gameover", "Terminar partida"),
+        ("wholeft", "Quiénes faltan por tirar."),
     ]
     await bot.set_my_commands(
         commands=common_commands, scope=telegram.BotCommandScopeAllGroupChats()
@@ -38,6 +40,9 @@ def configure_handlers(application: Application):
     application.add_handler(CommandHandler(command="add", callback=add_user_command))
     application.add_handler(
         CommandHandler(command="remove", callback=remove_user_command)
+    )
+    application.add_handler(
+        CommandHandler(command="wholeft", callback=who_are_left_command)
     )
     application.add_handler(CommandHandler(command="play", callback=play_command))
     application.add_handler(
