@@ -7,10 +7,11 @@ from telegram.ext import Application
 
 from app.config import configure, configure_handlers
 
-from .application import get_application
+from app.application import get_application
 
 
 def main(event, *args, **kwargs):
+    print(event)
     application = get_application()
     routes = {
         "/webhook": webhook,
