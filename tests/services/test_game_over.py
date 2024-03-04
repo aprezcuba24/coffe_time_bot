@@ -1,5 +1,3 @@
-from unittest.mock import AsyncMock, patch
-
 import pytest
 
 from tests.util import get_chat
@@ -37,6 +35,7 @@ async def test_more_than_one_user():
     assert tester.chat.game_over() == ["@aaa", "@bbb"]
     tester.assert_chat_data(
         {
+            "last_play_date": None,
             "users": {"@aaa": {}, "@bbb": {}},
             "active_users": ["@aaa", "@bbb", "@ccc"],
             "cycles": [
@@ -75,7 +74,33 @@ async def test_has_a_winner():
     assert tester.chat.game_over() == ["@ccc"]
     tester.assert_chat_data(
         {
+            "last_play_date": None,
             "users": {"@aaa": {}, "@bbb": {}, "@ccc": {"score": 1}},
+            "active_users": ["@aaa", "@bbb", "@ccc"],
+            "cycles": [],
+        }
+    )
+
+
+@pytest.mark.asyncio
+async def test_no_send_dice():
+    tester = await get_chat(
+        {
+            "users": {"@aaa": {}, "@bbb": {}, "@ccc": {}},
+            "active_users": ["@aaa", "@bbb", "@ccc"],
+            "cycles": [
+                {
+                    "users": ["@aaa", "@bbb", "@ccc"],
+                    "points": {},
+                }
+            ],
+        }
+    )
+    assert tester.chat.game_over() == []
+    tester.assert_chat_data(
+        {
+            "last_play_date": None,
+            "users": {"@aaa": {}, "@bbb": {}, "@ccc": {}},
             "active_users": ["@aaa", "@bbb", "@ccc"],
             "cycles": [],
         }

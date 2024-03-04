@@ -1,4 +1,4 @@
-from unittest.mock import AsyncMock, patch
+from datetime import datetime
 
 import pytest
 
@@ -18,6 +18,7 @@ async def test_yes():
     await play_yes_query(tester.update, tester.context)
     await tester.assert_save(
         {
+            "last_play_date": datetime.now().isoformat(timespec="minutes"),
             "users": {},
             "cycles": [{"users": ["@aaa", "@bbb"], "points": {}}],
             "active_users": ["@aaa", "@bbb"],

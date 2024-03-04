@@ -1,4 +1,4 @@
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock
 
 import pytest
 from telegram import InlineKeyboardMarkup
@@ -118,9 +118,12 @@ async def test_register_point():
     tester.update.effective_message.reply_text.assert_not_called()
     await tester.assert_save(
         {
+            "last_play_date": None,
             "users": {"@aaa": {"data": 1, "score": 1}},
             "active_users": ["@aaa", "@bbb"],
             "cycles": [],
         }
     )
-    bot.send_message.assert_called_once_with(chat_id=1, text="Tenemos un ganador @aaa")
+    bot.send_message.assert_called_once_with(
+        chat_id=1, text="Tenemos tenemos cafecito ☕️ de @aaa 🏆"
+    )

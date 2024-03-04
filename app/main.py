@@ -1,23 +1,17 @@
 import asyncio
 import json
-import os
 import traceback
 
 from telegram import Bot, Update
 from telegram.ext import Application
 
 from app.config import configure, configure_handlers
-from app.utils.persistence import DynamodbPersistence
+
+from .application import get_application
 
 
 def main(event, *args, **kwargs):
-    TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
-    application = (
-        Application.builder()
-        .token(TELEGRAM_TOKEN)
-        .persistence(DynamodbPersistence())
-        .build()
-    )
+    application = get_application()
     routes = {
         "/webhook": webhook,
         "/register-bot": register_bot,
@@ -47,7 +41,7 @@ async def webhook(event, application: Application):
         print("webhook =>", "Exception")
         print(exc)
         print(traceback.format_exc())
-        return {"statusCode": 500, "body": "Failure"}
+        return {"statusCode": 200, "body": "Failure"}
 
 
 async def register_bot(event, application: Application):

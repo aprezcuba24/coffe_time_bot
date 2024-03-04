@@ -1,5 +1,3 @@
-from unittest.mock import AsyncMock, MagicMock, patch
-
 import pytest
 
 from app.handlers.add_user import add_user_command
@@ -32,6 +30,7 @@ async def test_complete():
     tester.assert_reply_text(text="Los usuarios fueron añadidos.")
     await tester.assert_save(
         {
+            "last_play_date": None,
             "users": {"@aaa": {"data": 1}, "@bbb": {}},
             "active_users": ["@aaa", "@bbb"],
             "cycles": [],
