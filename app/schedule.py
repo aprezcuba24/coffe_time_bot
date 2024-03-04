@@ -1,3 +1,4 @@
+import asyncio
 import json
 from datetime import datetime
 
@@ -8,11 +9,14 @@ HOURS_DIFFERENCE = -5
 application = get_application()
 
 
-async def main(event, *args, **kwargs):
-    data = await application.persistence.get_chat_data()
-    if not data:
+def main(event, *args, **kwargs):
+    return asyncio.get_event_loop().run_until_complete(process_all(event))
+
+
+async def process_all(event):
+    chat_data = await application.persistence.get_chat_data()
+    if not chat_data:
         return {"statusCode": 200, "body": "no_chat"}
-    chat_data = json.loads(data["chat_data"])
     pivot_date = datetime.strptime(event["time"], "%Y-%m-%dT%H:%M:%SZ")
     for chat_id, chat_item in chat_data.items():
         await process_chat(pivot_date=pivot_date, chat_id=chat_id, chat_data=chat_item)

@@ -45,7 +45,9 @@ async def test_has_a_winner():
     bot = AsyncMock()
     tester.update.get_bot = lambda: bot
     await game_over_command(tester.update, tester.context)
-    bot.send_message.assert_called_once_with(chat_id=1, text="Tenemos tenemos cafecito ☕️ de @aaa 🏆")
+    bot.send_message.assert_called_once_with(
+        chat_id=1, text="Tenemos tenemos cafecito ☕️ de @aaa 🏆"
+    )
 
 
 @pytest.mark.asyncio
