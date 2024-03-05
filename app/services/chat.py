@@ -18,7 +18,7 @@ async def game_over_message(users, update: Update):
     if len(users) == 1:
         return await update.get_bot().send_message(
             chat_id=update.effective_chat.id,
-            text=f"Tenemos tenemos cafecito ☕️ de {users[0]} 🏆",
+            text=f"Tenemos cafecito ☕️ de {users[0]} 🏆",
         )
     return await update.get_bot().send_message(
         chat_id=update.effective_chat.id, text=f"Desempate {' '.join(users)}"

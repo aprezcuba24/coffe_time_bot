@@ -125,5 +125,5 @@ async def test_register_point():
         }
     )
     bot.send_message.assert_called_once_with(
-        chat_id=1, text="Tenemos tenemos cafecito ☕️ de @aaa 🏆"
+        chat_id=1, text="Tenemos cafecito ☕️ de @aaa 🏆"
     )
