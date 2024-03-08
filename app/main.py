@@ -5,9 +5,8 @@ import traceback
 from telegram import Bot, Update
 from telegram.ext import Application
 
-from app.config import configure, configure_handlers
-
 from app.application import get_application
+from app.config import configure, configure_handlers
 
 
 def main(event, *args, **kwargs):
