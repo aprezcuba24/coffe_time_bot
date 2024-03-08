@@ -162,6 +162,11 @@ class ChatItem:
             return None
         return self._get_last_cycle().who_are_left()
 
+    def ranking(self):
+        users = [item for item in self._users.items() if "score" in item[1]]
+        users.sort(reverse=True, key=lambda item: item[1]["score"])
+        return [(item[0], item[1]["score"]) for item in users]
+
 
 class Chat(ChatItem):
     @classmethod
@@ -180,7 +185,9 @@ class Chat(ChatItem):
         )
         self._active_username = f"@{update.effective_user.username}"
         self.message_id = update.effective_message.id
-        self.dice_value = update.message.dice.value if update.message.dice else 0
+        self.dice_value = (
+            update.message.dice.value if update.message and update.message.dice else 0
+        )
         self._update = update
         self._context = context
 
