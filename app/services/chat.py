@@ -1,3 +1,4 @@
+import time
 from datetime import datetime
 
 from telegram import Update
@@ -16,6 +17,7 @@ def start_params(users):
 
 async def game_over_message(users, update: Update):
     if len(users) == 1:
+        time.sleep(5)
         return await update.get_bot().send_message(
             chat_id=update.effective_chat.id,
             text=f"Tenemos cafecito ☕️ de {users[0]} 🏆",
