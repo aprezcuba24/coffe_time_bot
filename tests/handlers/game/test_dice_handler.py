@@ -1,4 +1,4 @@
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from telegram import InlineKeyboardMarkup
@@ -96,7 +96,8 @@ async def test_register_point():
 
 
 @pytest.mark.asyncio
-async def test_register_point():
+@patch("time.sleep", return_value=None)
+async def test_register_point(*args):
     tester = await get_chat(
         {
             "users": {"@aaa": {"data": 1}},
