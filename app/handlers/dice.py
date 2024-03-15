@@ -1,3 +1,5 @@
+import time
+
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 
@@ -38,6 +40,7 @@ async def dice_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat.register_point()
     if chat.is_the_last_user():
         users = chat.game_over()
+        time.sleep(5)
         await game_over_message(users, update)
     await chat.save()
 
