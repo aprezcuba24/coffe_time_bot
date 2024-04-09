@@ -7,6 +7,7 @@ from telegram.ext import (
     filters,
 )
 
+from app.handlers.abort import abort_command, abort_no_query, abort_yes_query
 from app.handlers.add_user import add_user_command
 from app.handlers.dice import dice_handler, no_play_dice_query, yes_play_dice_query
 from app.handlers.game import play_command, play_no_query, play_yes_query
@@ -25,6 +26,7 @@ async def configure(bot: telegram.Bot):
         ("gameover", "Terminar partida"),
         ("wholeft", "Quiénes faltan por tirar."),
         ("ranking", "Ranking haciendo café"),
+        ("abort", "Abortar un juego."),
     ]
     await bot.set_my_commands(
         commands=common_commands, scope=telegram.BotCommandScopeAllGroupChats()
@@ -48,6 +50,11 @@ def configure_handlers(application: Application):
     )
     application.add_handler(CommandHandler(command="play", callback=play_command))
     application.add_handler(CommandHandler(command="ranking", callback=ranking_command))
+
+    application.add_handler(CommandHandler(command="abort", callback=abort_command))
+    application.add_handler(CallbackQueryHandler(abort_no_query, pattern="abort_no"))
+    application.add_handler(CallbackQueryHandler(abort_yes_query, pattern="abort_yes"))
+
     application.add_handler(
         CommandHandler(command="gameOver", callback=game_over_command)
     )

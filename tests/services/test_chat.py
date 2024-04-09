@@ -302,3 +302,22 @@ async def test_who_are_left_one():
         },
     )
     assert tester.chat.who_are_left() == ["@bbb"]
+
+
+@pytest.mark.asyncio
+async def test_abort():
+    tester = await get_chat(
+        {
+            "active_users": ["@aaa", "@bbb"],
+            "cycles": [{"users": ["@aaa", "@bbb"], "points": {"@aaa": {}}}],
+        },
+    )
+    tester.chat.abort()
+    tester.assert_chat_data(
+        {
+            "last_play_date": None,
+            "users": {},
+            "active_users": ["@aaa", "@bbb"],
+            "cycles": [],
+        }
+    )
