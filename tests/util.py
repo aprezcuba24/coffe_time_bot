@@ -33,6 +33,8 @@ async def _assert_save(data, context):
 
 
 def _assert_chat_data(chat, data):
+    print(data)
+    print(chat.to_dict())
     assert chat.to_dict() == data
 
 

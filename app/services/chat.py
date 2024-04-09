@@ -139,6 +139,9 @@ class ChatItem:
     def is_the_last_user(self):
         return self._get_last_cycle().is_completed()
 
+    def abort(self):
+        self._cycles = []
+
     def game_over(self):
         if not self.has_open_game():
             return None
@@ -190,6 +193,10 @@ class Chat(ChatItem):
         )
         self._update = update
         self._context = context
+
+    @property
+    def active_username(self):
+        return self._active_username
 
     def register_point(self, message_id=None, value=None):
         if not self.has_open_game():
