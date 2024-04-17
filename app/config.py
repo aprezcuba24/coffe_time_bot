@@ -28,7 +28,7 @@ async def configure(bot: telegram.Bot):
         ("wholeft", "Quiénes faltan por tirar."),
         ("ranking", "Ranking haciendo café"),
         ("abort", "Abortar un juego."),
-        ("info", "Información del juego"),
+        # ("info", "Información del juego"),
     ]
     await bot.set_my_commands(
         commands=common_commands, scope=telegram.BotCommandScopeAllGroupChats()
@@ -74,4 +74,4 @@ def configure_handlers(application: Application):
     application.add_handler(
         MessageHandler(filters.Dice.DICE & filters.ChatType.GROUPS, dice_handler)
     )
-    application.add_handler(CommandHandler(command="info", callback=info_command))
+    # application.add_handler(CommandHandler(command="info", callback=info_command))
