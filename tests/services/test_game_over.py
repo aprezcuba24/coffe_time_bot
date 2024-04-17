@@ -11,7 +11,11 @@ async def test_no_open_game(*args):
             "active_users": ["@aaa", "@bbb"],
         }
     )
-    assert tester.chat.game_over() is None
+    try:
+        tester.chat.game_over()
+        assert False
+    except Exception as e:
+        assert True
 
 
 @pytest.mark.asyncio
@@ -96,12 +100,17 @@ async def test_no_send_dice():
             ],
         }
     )
-    assert tester.chat.game_over() == []
+    assert tester.chat.game_over() == None
     tester.assert_chat_data(
         {
             "last_play_date": None,
             "users": {"@aaa": {}, "@bbb": {}, "@ccc": {}},
             "active_users": ["@aaa", "@bbb", "@ccc"],
-            "cycles": [],
+            "cycles": [
+                {
+                    "users": ["@aaa", "@bbb", "@ccc"],
+                    "points": {},
+                }
+            ],
         }
     )

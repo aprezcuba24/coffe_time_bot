@@ -21,7 +21,7 @@ async def test_no_open_game():
         {"users": {"@aaa": {"data": 1}}, "active_users": ["@aaa"]}, username="aaa"
     )
     assert await game_over_command(tester.update, tester.context)
-    tester.assert_reply_text(text="No hay ningún juego abierto o no se llegó a jugar.")
+    tester.assert_reply_text(text="No hay ningún juego abierto.")
 
 
 @pytest.mark.asyncio
@@ -93,4 +93,4 @@ async def test_no_dice():
     bot = AsyncMock()
     tester.update.get_bot = lambda: bot
     await game_over_command(tester.update, tester.context)
-    tester.assert_reply_text(text="No hay ningún juego abierto o no se llegó a jugar.")
+    tester.assert_reply_text(text="Todavía no se ha jugado.")

@@ -144,11 +144,11 @@ class ChatItem:
 
     def game_over(self):
         if not self.has_open_game():
-            return None
+            raise Exception("There are not open game.")
         last_cycle: CycleItem = self._get_last_cycle()
         usernames = last_cycle.get_users_by_score()
         if len(usernames) == 0:
-            self._cycles = []
+            return None
         elif len(usernames) > 1:
             self._cycles.append(CycleItem(users=usernames))
         else:
