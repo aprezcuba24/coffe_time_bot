@@ -17,10 +17,9 @@ TEXT = """
 Las dudas verlas con @rpupo85 🤪
 """
 
-INFO_IMAGE = "AgACAgEAAxkBAAJMSmYefIoFsoARV8KRanSpsM_mx2zeAAKyrDEbow3xRNB1ed6aYcwwAQADAgADcwADNAQ"
-
 
 async def info_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    file_id = os.environ.get("INFO_IMAGE_ID")
     return await update.message.reply_photo(
-        photo=INFO_IMAGE, caption=TEXT, parse_mode=ParseMode.MARKDOWN
+        photo=file_id, caption=TEXT, parse_mode=ParseMode.MARKDOWN
     )

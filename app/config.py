@@ -76,4 +76,4 @@ def configure_handlers(application: Application):
         MessageHandler(filters.Dice.DICE & filters.ChatType.GROUPS, dice_handler)
     )
     application.add_handler(MessageHandler(filters.ChatType.PRIVATE, message_debug))
-    # application.add_handler(CommandHandler(command="info", callback=info_command))
+    application.add_handler(CommandHandler(command="info", callback=info_command))
