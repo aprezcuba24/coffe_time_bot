@@ -31,6 +31,7 @@ provider:
             - '*'
   environment:
     TELEGRAM_TOKEN: ${env:TELEGRAM_TOKEN}
+    INFO_IMAGE_ID: ${env:INFO_IMAGE_ID}
     REGION: us-east-1
     USER_TABLE: ${self:custom.user_table}
     BOT_NAME: ${self:custom.bot_name}
