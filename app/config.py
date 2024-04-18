@@ -17,6 +17,7 @@ from app.handlers.ranking import ranking_command
 from app.handlers.remove_user import remove_user_command
 from app.handlers.start import start_command, start_query
 from app.handlers.who_are_left import who_are_left_command
+from app.handlers.message_debug import message_debug
 
 
 async def configure(bot: telegram.Bot):
@@ -74,4 +75,5 @@ def configure_handlers(application: Application):
     application.add_handler(
         MessageHandler(filters.Dice.DICE & filters.ChatType.GROUPS, dice_handler)
     )
+    application.add_handler(MessageHandler(filters.ChatType.PRIVATE, message_debug))
     # application.add_handler(CommandHandler(command="info", callback=info_command))
