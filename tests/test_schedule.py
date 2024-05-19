@@ -1,7 +1,11 @@
+import os
 from datetime import datetime
 from unittest.mock import patch
 
 import pytest
+
+os.environ["REGION"] = "us-east-1"
+os.environ["TELEGRAM_TOKEN"] = "1234563648:BBert67CnCnCDEiNYa1ktcEw2Imocktoken"
 
 from app.schedule import process_all
 
