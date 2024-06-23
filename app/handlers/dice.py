@@ -16,6 +16,10 @@ def get_buttons(user_id, message_id, value):
 
 
 async def dice_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.message.forward_from is not None:
+        return await update.effective_message.reply_text(
+            text="No se permite hacer forward.\nDebe lanzar el dado en el canal. 😡"
+        )
     chat = await Chat.get_instance(update, context)
     if not chat.is_active_user():
         return await user_not_active(update)
