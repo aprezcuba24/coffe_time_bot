@@ -26,7 +26,7 @@ async def test_called_by_other_user():
             "active_users": ["@aaa", "@bbb"],
             "cycles": [],
         },
-        callback_query_data="dice_yes_play/111/7525/5",
+        callback_query_data="dice_yes_play/111",
         username="aaa",
         user_id=222,
     )
@@ -41,7 +41,7 @@ async def test_new_game():
             "active_users": ["@aaa", "@bbb"],
             "cycles": [],
         },
-        callback_query_data="dice_yes_play/111/7525/5",
+        callback_query_data="dice_yes_play/111",
         username="aaa",
         user_id=111,
     )
@@ -57,7 +57,7 @@ async def test_new_game():
             "cycles": [
                 {
                     "users": ["@aaa", "@bbb"],
-                    "points": {"@aaa": {"message_id": 7525, "value": 5}},
+                    "points": {},
                 }
             ],
         }

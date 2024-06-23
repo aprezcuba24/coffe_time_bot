@@ -18,6 +18,19 @@ async def test_no_is_active_user():
 
 
 @pytest.mark.asyncio
+async def test_is_forward():
+    tester = await get_chat(
+        {"users": {"@aaa": {"data": 1}}, "active_users": ["@aaa"]},
+        username="bbb",
+        forward_from=True,  # It shoudl be an user object but I will try it here like a boolean.
+    )
+    await dice_handler(tester.update, tester.context)
+    tester.assert_reply_text(
+        text="No se permite hacer forward.\nDebe lanzar el dado en el canal. 😡"
+    )
+
+
+@pytest.mark.asyncio
 async def test_no_has_open_game():
     tester = await get_chat(
         {"users": {"@aaa": {"data": 1}}, "active_users": ["@aaa"]},
@@ -27,7 +40,7 @@ async def test_no_has_open_game():
         user_id=111,
     )
     await dice_handler(tester.update, tester.context)
-    buttons = get_buttons(111, 5555, 1)
+    buttons = get_buttons(111)
     tester.assert_reply_text(
         reply_markup=InlineKeyboardMarkup([buttons]),
         text="No hay una partida abierta. ¿Quiere abrir una?",

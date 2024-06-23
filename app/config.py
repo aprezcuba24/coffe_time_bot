@@ -13,15 +13,17 @@ from app.handlers.dice import dice_handler, no_play_dice_query, yes_play_dice_qu
 from app.handlers.game import play_command, play_no_query, play_yes_query
 from app.handlers.game_over import game_over_command
 from app.handlers.info import info_command
+from app.handlers.message_debug import message_debug
 from app.handlers.ranking import ranking_command
 from app.handlers.remove_user import remove_user_command
 from app.handlers.start import start_command, start_query
+from app.handlers.coffee_ready import coffee_ready_command
 from app.handlers.who_are_left import who_are_left_command
-from app.handlers.message_debug import message_debug
 
 
 async def configure(bot: telegram.Bot):
     common_commands = [
+        ("coffee", "Informar que el café está listo."),
         ("play", "Comenzar nuevo juego."),
         ("add", "Adicionar usuario."),
         ("remove", "Eliminar usuario."),
@@ -50,6 +52,9 @@ def configure_handlers(application: Application):
     )
     application.add_handler(
         CommandHandler(command="wholeft", callback=who_are_left_command)
+    )
+    application.add_handler(
+        CommandHandler(command="coffee", callback=coffee_ready_command)
     )
     application.add_handler(CommandHandler(command="play", callback=play_command))
     application.add_handler(CommandHandler(command="ranking", callback=ranking_command))
