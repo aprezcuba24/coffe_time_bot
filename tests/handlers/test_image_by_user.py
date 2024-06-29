@@ -1,3 +1,5 @@
+import os
+
 import pytest
 
 from app.handlers.manage_user_image import (
@@ -5,6 +7,15 @@ from app.handlers.manage_user_image import (
     images_by_users_command,
 )
 from tests.util import get_chat
+
+os.environ = {"ADMIN_USERS": "username_enter"}
+
+
+@pytest.mark.asyncio
+async def test_not_access():
+    tester = await get_chat({}, username="username_enter_other")
+    await images_by_users_command(tester.update, tester.context)
+    tester.assert_reply_text(text="No tiene acceso a esta funcionalidad.")
 
 
 @pytest.mark.asyncio
@@ -16,7 +27,8 @@ async def test_images_by_users():
                 "@bbb": {"image": None},
                 "@ccc": {},
             },
-        }
+        },
+        username="username_enter",
     )
     await images_by_users_command(tester.update, tester.context)
     tester.assert_send_photo(photo="a_value", caption="@aaa")
@@ -33,6 +45,7 @@ async def test_image_of_users_none():
             },
         },
         args=["@ccc"],
+        username="username_enter",
     )
     await image_of_user_command(tester.update, tester.context)
     tester.assert_reply_text(text="No hay imagen")
@@ -49,6 +62,7 @@ async def test_image_of_users_no_exits():
             },
         },
         args=["@ddd"],
+        username="username_enter",
     )
     await image_of_user_command(tester.update, tester.context)
     tester.assert_reply_text(text="No hay imagen")
@@ -65,6 +79,7 @@ async def test_image_of_user():
             },
         },
         args=["@aaa"],
+        username="username_enter",
     )
     await image_of_user_command(tester.update, tester.context)
     tester.assert_reply_photo(photo="a_value")

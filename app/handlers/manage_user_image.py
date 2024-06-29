@@ -2,8 +2,10 @@ from telegram import Update
 from telegram.ext import ContextTypes
 
 from app.services.chat import Chat
+from app.utils.security import security
 
 
+@security
 async def images_by_users_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = await Chat.get_instance(update, context)
     images = chat.images_by_user()
@@ -13,6 +15,7 @@ async def images_by_users_command(update: Update, context: ContextTypes.DEFAULT_
         await update.effective_chat.send_photo(photo=image, caption=username)
 
 
+@security
 async def image_of_user_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = await Chat.get_instance(update, context)
     if len(context.args) != 1:
