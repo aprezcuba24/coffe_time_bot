@@ -170,6 +170,14 @@ class ChatItem:
         users.sort(reverse=True, key=lambda item: item[1]["score"])
         return [(item[0], item[1]["score"]) for item in users]
 
+    def images_by_user(self):
+        users = [
+            item
+            for item in self._users.items()
+            if "image" in item[1] and item[1]["image"]
+        ]
+        return [(item[0], item[1]["image"]) for item in users]
+
 
 class Chat(ChatItem):
     @classmethod

@@ -9,6 +9,7 @@ from telegram.ext import (
 
 from app.handlers.abort import abort_command, abort_no_query, abort_yes_query
 from app.handlers.add_user import add_user_command
+from app.handlers.coffee_ready import coffee_ready_command
 from app.handlers.dice import dice_handler, no_play_dice_query, yes_play_dice_query
 from app.handlers.game import play_command, play_no_query, play_yes_query
 from app.handlers.game_over import game_over_command
@@ -17,7 +18,6 @@ from app.handlers.message_debug import message_debug
 from app.handlers.ranking import ranking_command
 from app.handlers.remove_user import remove_user_command
 from app.handlers.start import start_command, start_query
-from app.handlers.coffee_ready import coffee_ready_command
 from app.handlers.who_are_left import who_are_left_command
 
 
