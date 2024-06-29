@@ -178,6 +178,13 @@ class ChatItem:
         ]
         return [(item[0], item[1]["image"]) for item in users]
 
+    def image_of_user(self, username):
+        return (
+            self._users[username]["image"]
+            if username in self._users and "image" in self._users[username]
+            else None
+        )
+
 
 class Chat(ChatItem):
     @classmethod

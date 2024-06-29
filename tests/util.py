@@ -53,6 +53,10 @@ def _assert_send_photo(update, **kwargs):
     update.effective_chat.send_photo.assert_called_once_with(**kwargs)
 
 
+def _assert_reply_photo(update, **kwargs):
+    update.effective_message.reply_photo.assert_called_once_with(**kwargs)
+
+
 async def get_chat(data, **kwargs):
     data = data if data else {}
     update, context = _load_params(**kwargs)
@@ -79,6 +83,9 @@ async def get_chat(data, **kwargs):
     def assert_send_photo(**kwargs):
         _assert_send_photo(update, **kwargs)
 
+    def assert_reply_photo(**kwargs):
+        _assert_reply_photo(update, **kwargs)
+
     Chat._instance = None
     tester = Object()
     tester.chat = chat
@@ -89,5 +96,6 @@ async def get_chat(data, **kwargs):
     tester.assert_chat_data = assert_chat_data
     tester.assert_edit_text = assert_edit_text
     tester.assert_send_photo = assert_send_photo
+    tester.assert_reply_photo = assert_reply_photo
 
     return tester
