@@ -23,6 +23,10 @@ def _load_params(**kwargs):
         update.callback_query.data = kwargs["callback_query_data"]
     if "user_id" in kwargs:
         update.effective_user.id = kwargs["user_id"]
+    if "caption" in kwargs:
+        update.effective_message.caption = kwargs["caption"]
+    if "photo" in kwargs:
+        update.effective_message.photo = kwargs["photo"]
     update.message.forward_from = (
         kwargs["forward_from"] if "forward_from" in kwargs else None
     )

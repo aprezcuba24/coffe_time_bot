@@ -1,10 +1,12 @@
 import os
 
 import pytest
+from telegram import PhotoSize
 
 from app.handlers.manage_user_image import (
     image_of_user_command,
     images_by_users_command,
+    upload_photo,
 )
 from tests.util import get_chat
 
@@ -83,3 +85,51 @@ async def test_image_of_user():
     )
     await image_of_user_command(tester.update, tester.context)
     tester.assert_reply_photo(photo="a_value")
+
+
+@pytest.mark.asyncio
+async def test_upload_image_user_not_exists():
+    tester = await get_chat(
+        {
+            "users": {
+                "@aaa": {"image": "a_value"},
+                "@bbb": {"image": None},
+                "@ccc": {},
+            },
+        },
+        caption="@ddd",
+        username="username_enter",
+    )
+    await upload_photo(tester.update, tester.context)
+    tester.assert_reply_text(text="El usuario no existe.")
+
+
+@pytest.mark.asyncio
+async def test_upload_image_user():
+    photo = [None, None, None, PhotoSize("file_id_mock", "", 2, 2)]
+    tester = await get_chat(
+        {
+            "users": {
+                "@aaa": {"image": "a_value"},
+                "@bbb": {"image": None},
+                "@ccc": {},
+            },
+        },
+        caption="@bbb",
+        username="username_enter",
+        photo=photo,
+    )
+    await upload_photo(tester.update, tester.context)
+    tester.assert_reply_text(text="Hecho.")
+    await tester.assert_save(
+        {
+            "last_play_date": None,
+            "users": {
+                "@aaa": {"image": "a_value"},
+                "@bbb": {"image": "file_id_mock"},
+                "@ccc": {},
+            },
+            "active_users": [],
+            "cycles": [],
+        }
+    )

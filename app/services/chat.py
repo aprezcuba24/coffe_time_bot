@@ -185,6 +185,16 @@ class ChatItem:
             else None
         )
 
+    def has_username(self, username: str):
+        print(username, self._users)
+        return True if username in self._users else False
+
+    def update_image_of_user(self, username: str, file_id: str):
+        if username not in self._users:
+            raise Exception("The user does not exists.")
+        self._users[username]["image"] = file_id
+        return True
+
 
 class Chat(ChatItem):
     @classmethod
