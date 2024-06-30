@@ -36,7 +36,7 @@ async def test_more_than_one_user():
             ],
         }
     )
-    assert tester.chat.game_over() == ["@aaa", "@bbb"]
+    assert tester.chat.game_over() == [("@aaa", {}), ("@bbb", {})]
     tester.assert_chat_data(
         {
             "last_play_date": None,
@@ -75,7 +75,7 @@ async def test_has_a_winner():
             ],
         }
     )
-    assert tester.chat.game_over() == ["@ccc"]
+    assert tester.chat.game_over() == [("@ccc", {"score": 1})]
     tester.assert_chat_data(
         {
             "last_play_date": None,

@@ -1,3 +1,4 @@
+import os
 from unittest.mock import AsyncMock
 
 import pytest
@@ -94,3 +95,57 @@ async def test_no_dice():
     tester.update.get_bot = lambda: bot
     await game_over_command(tester.update, tester.context)
     tester.assert_reply_text(text="Todavía no se ha jugado.")
+
+
+@pytest.mark.asyncio
+async def test_has_a_winner_photo_no_feature_enabled():
+    os.environ["USER_IMAGE"] = "True"
+    tester = await get_chat(
+        {
+            "users": {"@aaa": {"data": 1}, "@bbb": {}},
+            "active_users": ["@aaa", "@bbb"],
+            "cycles": [
+                {
+                    "users": ["@aaa", "@bbb"],
+                    "points": {
+                        "@aaa": {"message_id": 1111, "value": 1},
+                        "@bbb": {"message_id": 1111, "value": 2},
+                    },
+                }
+            ],
+        },
+        username="aaa",
+    )
+    bot = AsyncMock()
+    tester.update.get_bot = lambda: bot
+    await game_over_command(tester.update, tester.context)
+    bot.send_message.assert_called_once_with(
+        chat_id=1, text="Tenemos cafecito ☕️ de @aaa 🏆"
+    )
+
+
+@pytest.mark.asyncio
+async def test_has_a_winner_photo():
+    os.environ["USER_IMAGE"] = "True"
+    tester = await get_chat(
+        {
+            "users": {"@aaa": {"data": 1, "image": "image_file_id"}, "@bbb": {}},
+            "active_users": ["@aaa", "@bbb"],
+            "cycles": [
+                {
+                    "users": ["@aaa", "@bbb"],
+                    "points": {
+                        "@aaa": {"message_id": 1111, "value": 1},
+                        "@bbb": {"message_id": 1111, "value": 2},
+                    },
+                }
+            ],
+        },
+        username="aaa",
+    )
+    bot = AsyncMock()
+    tester.update.get_bot = lambda: bot
+    await game_over_command(tester.update, tester.context)
+    bot.send_photo.assert_called_once_with(
+        photo="image_file_id", chat_id=1, caption="Tenemos cafecito ☕️ de @aaa 🏆"
+    )

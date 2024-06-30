@@ -3,6 +3,8 @@ from datetime import datetime
 from telegram import Update
 from telegram.ext import ContextTypes
 
+from app.utils.feature_enable import is_feature_enable
+
 
 async def user_not_active(update):
     return await update.effective_message.reply_text(
@@ -15,13 +17,26 @@ def start_params(users):
 
 
 async def game_over_message(users, update: Update):
+    # TODO: Create a class to manage the user to avoid to use dict
     if len(users) == 1:
+        text = f"Tenemos cafecito ☕️ de {users[0][0]} 🏆"
+        if (
+            is_feature_enable("USER_IMAGE")
+            and "image" in users[0][1]
+            and users[0][1]["image"]
+        ):
+            return await update.get_bot().send_photo(
+                photo=users[0][1]["image"],
+                caption=text,
+                chat_id=update.effective_chat.id,
+            )
         return await update.get_bot().send_message(
             chat_id=update.effective_chat.id,
-            text=f"Tenemos cafecito ☕️ de {users[0]} 🏆",
+            text=text,
         )
+    usernames = [item[0] for item in users]
     return await update.get_bot().send_message(
-        chat_id=update.effective_chat.id, text=f"Desempate {' '.join(users)}"
+        chat_id=update.effective_chat.id, text=f"Desempate {' '.join(usernames)}"
     )
 
 
@@ -158,7 +173,7 @@ class ChatItem:
             score = self._users[user].get("score", 0)
             self._users[user]["score"] = score + 1
             self._cycles = []
-        return usernames
+        return [self.get_user_data(item) for item in usernames]
 
     def who_are_left(self):
         if not self.has_open_game():
@@ -169,6 +184,34 @@ class ChatItem:
         users = [item for item in self._users.items() if "score" in item[1]]
         users.sort(reverse=True, key=lambda item: item[1]["score"])
         return [(item[0], item[1]["score"]) for item in users]
+
+    def images_by_user(self):
+        users = [
+            item
+            for item in self._users.items()
+            if "image" in item[1] and item[1]["image"]
+        ]
+        return [(item[0], item[1]["image"]) for item in users]
+
+    def image_of_user(self, username):
+        return (
+            self._users[username]["image"]
+            if username in self._users and "image" in self._users[username]
+            else None
+        )
+
+    def has_username(self, username: str):
+        print(username, self._users)
+        return True if username in self._users else False
+
+    def update_image_of_user(self, username: str, file_id: str):
+        if username not in self._users:
+            raise Exception("The user does not exists.")
+        self._users[username]["image"] = file_id
+        return True
+
+    def get_user_data(self, username: str):
+        return (username, self._users[username])
 
 
 class Chat(ChatItem):
