@@ -1,4 +1,5 @@
 from datetime import datetime
+import select
 
 from telegram import Update
 from telegram.ext import ContextTypes
@@ -86,6 +87,9 @@ class CycleItem:
     def who_are_left(self):
         return [item for item in self._users if item not in self._points]
 
+    def remove_user(self, username: str):
+        self._users = [item for item in self._users if item != username]
+
 
 class ChatItem:
     def __init__(self, chat_id, persistence):
@@ -145,6 +149,9 @@ class ChatItem:
 
     def _get_last_cycle(self) -> CycleItem:
         return self._cycles[-1]
+
+    def _is_first_cycle(self) -> bool:
+        return len(self._cycles) == 1
 
     def user_has_dice(self):
         if not self.has_open_game():
@@ -261,3 +268,14 @@ class Chat(ChatItem):
         return not self._user_has_dice() and self._get_last_cycle().has_user(
             self._active_username
         )
+
+    def ignore_user(self):
+        if not self.has_open_game():
+            raise Exception("No hay juego abierto.")
+        if not self._is_first_cycle():
+            raise Exception("Solo se puede ignorar en el primer ciclo.")
+        if self._user_has_dice():
+            raise Exception("Ya lanzó el dado.")
+        if not self._get_last_cycle().has_user(self._active_username):
+            raise Exception("No tiene que lanzar el dado.")
+        return self._get_last_cycle().remove_user(self._active_username)

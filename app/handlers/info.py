@@ -13,6 +13,8 @@ TEXT = """
 
 🚰 Si no hay agua se hace de los bebederos, si no de los desechos líquidos del cuerpo.
 
+📣 El que haga el café tiene que avisar en el canal.
+
 *PD*
 Las dudas verlas con @rpupo85 🤪
 """
