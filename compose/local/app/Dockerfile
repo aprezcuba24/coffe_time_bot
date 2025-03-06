@@ -16,6 +16,7 @@ RUN apt-get update \
   && apt-get install -y libpq-dev \
   # Translations dependencies
   && apt-get install -y gettext \
+  && apt-get install -y procps \
   # Install pylint
   && pip install pylint \
   # Create a non-root user to use if preferred - see https://aka.ms/vscode-remote/containers/non-root-user.

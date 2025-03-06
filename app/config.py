@@ -13,6 +13,7 @@ from app.handlers.coffee_ready import coffee_ready_command
 from app.handlers.dice import dice_handler, no_play_dice_query, yes_play_dice_query
 from app.handlers.game import play_command, play_no_query, play_yes_query
 from app.handlers.game_over import game_over_command
+from app.handlers.ignore import ignore_command
 from app.handlers.info import info_command
 from app.handlers.manage_user_image import (
     image_of_user_command,
@@ -34,6 +35,7 @@ async def configure(bot: telegram.Bot):
         ("remove", "Eliminar usuario."),
         ("gameover", "Terminar partida"),
         ("wholeft", "Quiénes faltan por tirar."),
+        ("ignore", "Ignorar un usuario"),
         ("ranking", "Ranking haciendo café"),
         ("abort", "Abortar un juego."),
         ("info", "Información del juego"),
@@ -78,6 +80,7 @@ def configure_handlers(application: Application):
     application.add_handler(
         CommandHandler(command="wholeft", callback=who_are_left_command)
     )
+    application.add_handler(CommandHandler(command="ignore", callback=ignore_command))
     application.add_handler(
         CommandHandler(command="coffee", callback=coffee_ready_command)
     )
