@@ -35,7 +35,7 @@ async def configure(bot: telegram.Bot):
         ("remove", "Eliminar usuario."),
         ("gameover", "Terminar partida"),
         ("wholeft", "Quiénes faltan por tirar."),
-        ("ignore", "Ignorar un usuario"),
+        ("ignoreme", "Ignorar un usuario"),
         ("ranking", "Ranking haciendo café"),
         ("abort", "Abortar un juego."),
         ("info", "Información del juego"),
@@ -80,7 +80,7 @@ def configure_handlers(application: Application):
     application.add_handler(
         CommandHandler(command="wholeft", callback=who_are_left_command)
     )
-    application.add_handler(CommandHandler(command="ignore", callback=ignore_command))
+    application.add_handler(CommandHandler(command="ignoreme", callback=ignore_command))
     application.add_handler(
         CommandHandler(command="coffee", callback=coffee_ready_command)
     )
