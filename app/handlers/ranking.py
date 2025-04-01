@@ -9,8 +9,7 @@ def user_text(index, ranking):
     icons = ["🥇", "🥈", "🥉"]
     user, score = ranking
     icon = icons[index] if index < len(icons) else "🔸"
-    username = user.replace("_", "")
-    return f"{icon} {username} 👉 {score}"
+    return f"{icon} {user} 👉 {score}"
 
 
 async def ranking_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -19,8 +18,6 @@ async def ranking_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if len(ranking) == 0:
         return await update.effective_message.reply_text(text="Todavía no hay ranking")
     list = [user_text(index, item) for index, item in enumerate(ranking)]
-    print(list)
     return await update.effective_message.reply_text(
-        text="\n".join(["*Ranking*"] + list),
-        parse_mode=ParseMode.MARKDOWN,
+        text="\n".join(list),
     )

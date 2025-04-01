@@ -31,6 +31,5 @@ async def test_ranking():
     )
     await ranking_command(tester.update, tester.context)
     tester.assert_reply_text(
-        text="*Ranking*\n🥇 @eee 👉 4\n🥈 @ddd 👉 3\n🥉 @bbb 👉 2\n🔸 @aaa 👉 1",
-        parse_mode=ParseMode.MARKDOWN,
+        text="🥇 @eee 👉 4\n🥈 @ddd 👉 3\n🥉 @bbb 👉 2\n🔸 @aaa 👉 1",
     )
