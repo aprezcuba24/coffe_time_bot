@@ -1,5 +1,4 @@
 from datetime import datetime
-import select
 
 from telegram import Update
 from telegram.ext import ContextTypes
@@ -42,9 +41,10 @@ async def game_over_message(users, update: Update):
 
 
 class CycleItem:
-    def __init__(self, users, points=None):
+    def __init__(self, users, points=None, fuck=0):
         self._users = users
         self._points = {} if points is None else points
+        self._fuck = fuck
 
     @classmethod
     def load(cls, data):
@@ -56,6 +56,7 @@ class CycleItem:
         return {
             "users": self._users,
             "points": self._points,
+            "fuck": self._fuck,
         }
 
     def has_dice(self, username):
@@ -69,6 +70,9 @@ class CycleItem:
             "message_id": message_id,
             "value": value,
         }
+
+    def add_fuck(self, value):
+        self._fuck = value
 
     def get_users_by_score(self):
         min_value = 7
@@ -268,6 +272,14 @@ class Chat(ChatItem):
         return not self._user_has_dice() and self._get_last_cycle().has_user(
             self._active_username
         )
+
+    def has_fuck(self):
+        user_data = self._get_last_cycle().get_user_data(self._active_username)
+        return user_data.get("fuck", 0) > 0
+
+    def register_fuck(self, fuck):
+        last_cycle: CycleItem = self._get_last_cycle()
+        last_cycle.add_fuck(self._active_username, fuck)
 
     def ignore_user(self):
         if not self.has_open_game():

@@ -17,34 +17,16 @@ async def fuck_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not chat.is_active_user():
         return await user_not_active(update)
 
-    username = chat.active_username
-
-    # Check if the user has lost by examining their score in the ranking
-    # This is consistent with how users are checked in game_over_message
-    user_data = chat._users.get(username, {})
-    user_has_lost = user_data.get("score", 0) > 0
-
-    if user_has_lost:
-        emojis, symbol = FuckService.get_angry_emotes()
-
-        return await update.effective_message.reply_text(
-            text=f"{emojis} {symbol} {emojis}"
-        )
-
     if not chat.has_open_game():
         return await update.effective_message.reply_text(
             text="No hay una partida abierta. Inicia una con /play primero."
         )
-
     if not chat.user_has_dice():
         return await update.effective_message.reply_text(
             text="Debes lanzar el dado primero."
         )
-
-    if user_data.get("fuck_active", False):
-        return await update.effective_message.reply_text(
-            text="¡No te pases! 🤡"
-        )
+    if chat.has_fuck():
+        return await update.effective_message.reply_text(text="¡No te pases! 🤡")
 
     dice_value = chat.dice_value
 
@@ -52,16 +34,8 @@ async def fuck_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return await update.effective_message.reply_text(
             text="Vamos, no llores tanto, ganate el privilegio de usar el comando, tira un 1 o un 2."
         )
-
-    if username not in chat._users:
-        chat._users[username] = {}
-
-    chat._users[username]["fuck_active"] = True
-    chat._users[username]["fuck_value"] = dice_value
-
+    chat.register_fuck(dice_value)
     await chat.save()
-
     return await update.effective_message.reply_text(
         text=f"¡Preparado para joder! 😈 Cuando alguien saque {dice_value} o menos, recibirá tu maldición."
     )
- 

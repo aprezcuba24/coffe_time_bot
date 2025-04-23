@@ -45,7 +45,7 @@ async def dice_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         update=update,
         users_data=chat._users,
         current_username=chat.active_username,
-        current_dice_value=chat.dice_value
+        current_dice_value=chat.dice_value,
     )
 
     if chat.is_the_last_user():

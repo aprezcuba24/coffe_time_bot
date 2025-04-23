@@ -14,17 +14,23 @@ def test_get_users_to_trigger():
     }
     current_dice_value = 3  # Higher than the fuck_value
 
-    result = FuckService.get_users_to_trigger(current_username, users_data, current_dice_value)
+    result = FuckService.get_users_to_trigger(
+        current_username, users_data, current_dice_value
+    )
     assert result == []
 
     # Test with one user to trigger
     current_dice_value = 2  # Equal to the fuck_value
-    result = FuckService.get_users_to_trigger(current_username, users_data, current_dice_value)
+    result = FuckService.get_users_to_trigger(
+        current_username, users_data, current_dice_value
+    )
     assert result == ["@user2"]
 
     # Test with two users to trigger
     users_data["@user3"] = {"data": 1, "fuck_active": True, "fuck_value": 3}
-    result = FuckService.get_users_to_trigger(current_username, users_data, current_dice_value)
+    result = FuckService.get_users_to_trigger(
+        current_username, users_data, current_dice_value
+    )
     assert result == ["@user2", "@user3"]
 
 
@@ -82,15 +88,23 @@ async def test_process_fuck_triggers():
     current_dice_value = 3  # Higher than the fuck_value
 
     with patch.object(FuckService, "get_users_to_trigger", return_value=[]):
-        await FuckService.process_fuck_triggers(update, users_data, current_username, current_dice_value)
+        await FuckService.process_fuck_triggers(
+            update, users_data, current_username, current_dice_value
+        )
         update.effective_message.reply_text.assert_not_called()
 
     # Test with users to trigger
     with patch.object(FuckService, "get_users_to_trigger", return_value=["@user1"]):
-        with patch.object(FuckService, "get_random_reaction", return_value=("💩", "¡Te jodieron!")):
-            with patch.object(FuckService, "deactivate_fuck_commands") as mock_deactivate:
-                await FuckService.process_fuck_triggers(update, users_data, current_username, current_dice_value)
+        with patch.object(
+            FuckService, "get_random_reaction", return_value=("💩", "¡Te jodieron!")
+        ):
+            with patch.object(
+                FuckService, "deactivate_fuck_commands"
+            ) as mock_deactivate:
+                await FuckService.process_fuck_triggers(
+                    update, users_data, current_username, current_dice_value
+                )
                 update.effective_message.reply_text.assert_called_once_with(
                     text="¡Te jodieron! 💩 @user1 está disfrutando tu infortunio."
                 )
-                mock_deactivate.assert_called_once_with(users_data, ["@user1"]) 
+                mock_deactivate.assert_called_once_with(users_data, ["@user1"])
