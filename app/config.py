@@ -11,6 +11,7 @@ from app.handlers.abort import abort_command, abort_no_query, abort_yes_query
 from app.handlers.add_user import add_user_command
 from app.handlers.coffee_ready import coffee_ready_command
 from app.handlers.dice import dice_handler, no_play_dice_query, yes_play_dice_query
+from app.handlers.fuck import fuck_command
 from app.handlers.game import play_command, play_no_query, play_yes_query
 from app.handlers.game_over import game_over_command
 from app.handlers.ignore import ignore_command
@@ -39,6 +40,7 @@ async def configure(bot: telegram.Bot):
         ("ranking", "Ranking haciendo café"),
         ("abort", "Abortar un juego."),
         ("info", "Información del juego"),
+        ("fuck", "Joder al próximo que saque un número igual o menor que el tuyo"),
     ]
     await bot.set_my_commands(
         commands=common_commands, scope=telegram.BotCommandScopeAllGroupChats()
@@ -94,6 +96,7 @@ def configure_handlers(application: Application):
     application.add_handler(
         CommandHandler(command="gameOver", callback=game_over_command)
     )
+    application.add_handler(CommandHandler(command="fuck", callback=fuck_command))
     application.add_handler(CallbackQueryHandler(start_query, pattern="start"))
     application.add_handler(
         CallbackQueryHandler(play_yes_query, pattern="game_yes_play")

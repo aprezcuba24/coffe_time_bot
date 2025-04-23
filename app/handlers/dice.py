@@ -1,9 +1,11 @@
 import time
+import random
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 
 from app.services.chat import Chat, game_over_message, start_params, user_not_active
+from app.services.fuck_service import FuckService
 
 
 def get_buttons(user_id):
@@ -38,6 +40,14 @@ async def dice_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text="No puedes votar en esta ronda.",
         )
     chat.register_point()
+
+    await FuckService.process_fuck_triggers(
+        update=update,
+        users_data=chat._users,
+        current_username=chat.active_username,
+        current_dice_value=chat.dice_value
+    )
+
     if chat.is_the_last_user():
         users = chat.game_over()
         time.sleep(5)
