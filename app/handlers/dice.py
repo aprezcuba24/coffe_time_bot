@@ -5,6 +5,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 
 from app.services.chat import Chat, game_over_message, start_params, user_not_active
+from app.services.fuck_service import FuckService
 
 
 def get_buttons(user_id):
@@ -40,35 +41,12 @@ async def dice_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
     chat.register_point()
 
-    current_username = chat.active_username
-    current_dice_value = chat.dice_value
-
-    fuck_users = []
-    for username, user_data in chat._users.items():
-        if (username != current_username and
-            user_data.get("fuck_active", False) and
-            current_dice_value <= user_data.get("fuck_value", 6)):
-            fuck_users.append(username)
-
-    if fuck_users:
-        emojis = ["💩", "🖕", "🤡", "👹", "💀", "😈", "🤬", "🔪", "👺", "🤮"]
-        emoji = random.choice(emojis)
-
-        reactions = [
-            "¡Te jodieron!",
-            "¡Alguien te ha dado una maldición!",
-            "¡Qué mal número, te han jodido!",
-            "¡Alguien está feliz de verte sufrir!",
-            "¡Mala suerte, te han maldecido!"
-        ]
-        reaction = random.choice(reactions)
-
-        for username in fuck_users:
-            chat._users[username]["fuck_active"] = False
-
-        await update.effective_message.reply_text(
-            text=f"{reaction} {emoji} {' '.join(fuck_users)} está disfrutando tu infortunio."
-        )
+    await FuckService.process_fuck_triggers(
+        update=update,
+        users_data=chat._users,
+        current_username=chat.active_username,
+        current_dice_value=chat.dice_value
+    )
 
     if chat.is_the_last_user():
         users = chat.game_over()

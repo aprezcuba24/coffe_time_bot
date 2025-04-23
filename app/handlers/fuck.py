@@ -3,6 +3,7 @@ from telegram.ext import ContextTypes
 import random
 
 from app.services.chat import Chat, user_not_active
+from app.services.fuck_service import FuckService
 
 
 async def fuck_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -18,15 +19,13 @@ async def fuck_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     username = chat.active_username
 
+    # Check if the user has lost by examining their score in the ranking
+    # This is consistent with how users are checked in game_over_message
     user_data = chat._users.get(username, {})
     user_has_lost = user_data.get("score", 0) > 0
 
     if user_has_lost:
-        angry_emojis = ["💢", "🤬", "😡", "👿", "😤", "😠", "💥", "🔥", "👹", "👺"]
-        angry_symbols = ["grrrr", "argh", "maldición", "!!!!", "@#$%&!", "¡¡¡$#@!!!", "ufff"]
-
-        emojis = " ".join(random.sample(angry_emojis, k=min(3, len(angry_emojis))))
-        symbol = random.choice(angry_symbols)
+        emojis, symbol = FuckService.get_angry_emotes()
 
         return await update.effective_message.reply_text(
             text=f"{emojis} {symbol} {emojis}"
@@ -42,7 +41,6 @@ async def fuck_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text="Debes lanzar el dado primero."
         )
 
-    # Check if the user has already used the fuck command in this game
     if user_data.get("fuck_active", False):
         return await update.effective_message.reply_text(
             text="¡No te pases! 🤡"
@@ -50,10 +48,9 @@ async def fuck_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     dice_value = chat.dice_value
 
-    # Check if the dice value is 1 or 2
-    if dice_value not in [1, 2]:
+    if not FuckService.is_valid_dice_value(dice_value):
         return await update.effective_message.reply_text(
-            text="Solo puedes usar este comando si sacaste 1 o 2 en el dado."
+            text="Vamos, no llores tanto, ganate el privilegio de usar el comando, tira un 1 o un 2."
         )
 
     if username not in chat._users:
@@ -67,3 +64,4 @@ async def fuck_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return await update.effective_message.reply_text(
         text=f"¡Preparado para joder! 😈 Cuando alguien saque {dice_value} o menos, recibirá tu maldición."
     )
+ 

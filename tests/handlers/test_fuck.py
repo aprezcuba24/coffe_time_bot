@@ -1,7 +1,8 @@
 import pytest
-from unittest.mock import patch, ANY
+from unittest.mock import patch, ANY, MagicMock
 
 from app.handlers.fuck import fuck_command
+from app.services.fuck_service import FuckService
 from tests.util import get_chat
 
 
@@ -42,7 +43,8 @@ async def test_no_has_dice():
 
 
 @pytest.mark.asyncio
-async def test_success():
+@patch("app.services.fuck_service.FuckService.is_valid_dice_value", return_value=True)
+async def test_success(mock_is_valid_dice_value):
     tester = await get_chat(
         {
             "users": {"@aaa": {"data": 1}},
@@ -51,7 +53,7 @@ async def test_success():
             "last_play_date": None,
         },
         username="aaa",
-        message_value=2,
+        message_value=2,  # Using valid value (2)
     )
     await fuck_command(tester.update, tester.context)
     tester.assert_reply_text(
@@ -68,9 +70,8 @@ async def test_success():
 
 
 @pytest.mark.asyncio
-@patch("random.sample", return_value=["💢", "😡", "😤"])
-@patch("random.choice", return_value="maldición")
-async def test_user_has_lost(mock_choice, mock_sample):
+@patch("app.services.fuck_service.FuckService.get_angry_emotes", return_value=("💢 😡 😤", "maldición"))
+async def test_user_has_lost(mock_get_angry_emotes):
     """Test that when a user has lost (has a score), they just send angry emojis"""
     tester = await get_chat(
         {
@@ -80,11 +81,15 @@ async def test_user_has_lost(mock_choice, mock_sample):
         },
         username="aaa",
     )
+    
+    # Mock the ranking method to return that this user has a score
+    tester.chat.ranking = MagicMock(return_value=[("@aaa", 2)])
+    
     await fuck_command(tester.update, tester.context)
     tester.assert_reply_text(
         text="💢 😡 😤 maldición 💢 😡 😤"
     )
-    # No need to check for save as it doesn't save anything in this case 
+    # No need to check for save as it doesn't save anything in this case
 
 
 @pytest.mark.asyncio
@@ -107,7 +112,8 @@ async def test_already_active():
 
 
 @pytest.mark.asyncio
-async def test_dice_value_not_allowed():
+@patch("app.services.fuck_service.FuckService.is_valid_dice_value", return_value=False)
+async def test_dice_value_not_allowed(mock_is_valid_dice_value):
     """Test that users with dice values other than 1 or 2 cannot use the command"""
     tester = await get_chat(
         {
@@ -121,6 +127,6 @@ async def test_dice_value_not_allowed():
     )
     await fuck_command(tester.update, tester.context)
     tester.assert_reply_text(
-        text="Solo puedes usar este comando si sacaste 1 o 2 en el dado."
+        text="Vamos, no llores tanto, ganate el privilegio de usar el comando, tira un 1 o un 2."
     )
     # No changes should be saved to the state

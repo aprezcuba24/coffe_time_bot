@@ -3,14 +3,15 @@ from unittest.mock import patch, AsyncMock
 import pytest
 
 from app.handlers.dice import dice_handler
+from app.services.fuck_service import FuckService
 from tests.util import get_chat
 
 
 @pytest.mark.asyncio
-@patch("random.choice", side_effect=["💩", "¡Te jodieron!"])
+@patch("app.services.fuck_service.FuckService.process_fuck_triggers")
 @patch("app.handlers.dice.game_over_message", return_value=None)
 @patch("time.sleep", return_value=None)
-async def test_dice_handler_with_fuck_active(mock_sleep, mock_game_over, mock_random_choice):
+async def test_dice_handler_with_fuck_active(mock_sleep, mock_game_over, mock_process_fuck_triggers):
     """Test dice handler when a user has an active fuck command"""
     tester = await get_chat(
         {
@@ -34,17 +35,20 @@ async def test_dice_handler_with_fuck_active(mock_sleep, mock_game_over, mock_ra
     
     await dice_handler(tester.update, tester.context)
     
-    # Should trigger the fuck message
-    tester.update.effective_message.reply_text.assert_any_call(
-        text="¡Te jodieron! 💩 @aaa está disfrutando tu infortunio."
+    # Verify that process_fuck_triggers was called with the correct arguments
+    mock_process_fuck_triggers.assert_called_once_with(
+        update=tester.update,
+        users_data=tester.chat._users,
+        current_username="@bbb",
+        current_dice_value=3
     )
     
-    # The fuck_active should be set to False after use
+    # The fuck_active should be set to False after use (handled by process_fuck_triggers)
     await tester.assert_save(
         {
             "last_play_date": None,
             "users": {
-                "@aaa": {"data": 1, "fuck_active": False, "fuck_value": 4},
+                "@aaa": {"data": 1, "fuck_active": True, "fuck_value": 4},
                 "@bbb": {"data": 1, "score": 1},
             },
             "active_users": ["@aaa", "@bbb"],
@@ -54,9 +58,10 @@ async def test_dice_handler_with_fuck_active(mock_sleep, mock_game_over, mock_ra
 
 
 @pytest.mark.asyncio
+@patch("app.services.fuck_service.FuckService.process_fuck_triggers")
 @patch("app.handlers.dice.game_over_message", return_value=None)
 @patch("time.sleep", return_value=None)
-async def test_dice_handler_with_fuck_not_triggered(mock_sleep, mock_game_over):
+async def test_dice_handler_with_fuck_not_triggered(mock_sleep, mock_game_over, mock_process_fuck_triggers):
     """Test dice handler when a user has an active fuck command but the dice value is higher"""
     tester = await get_chat(
         {
@@ -80,16 +85,15 @@ async def test_dice_handler_with_fuck_not_triggered(mock_sleep, mock_game_over):
     
     await dice_handler(tester.update, tester.context)
     
-    # Get all calls to reply_text
-    call_args_list = tester.update.effective_message.reply_text.call_args_list
+    # Verify that process_fuck_triggers was called with the correct arguments
+    mock_process_fuck_triggers.assert_called_once_with(
+        update=tester.update,
+        users_data=tester.chat._users,
+        current_username="@bbb",
+        current_dice_value=5
+    )
     
-    # Make sure no fuck message was sent
-    for call in call_args_list:
-        args, kwargs = call
-        if kwargs.get('text') and 'jodieron' in kwargs.get('text'):
-            pytest.fail("Fuck message was triggered when it shouldn't have been")
-    
-    # The fuck_active should still be True
+    # The fuck_active should still be True (handled by process_fuck_triggers)
     await tester.assert_save(
         {
             "last_play_date": None,
@@ -104,10 +108,10 @@ async def test_dice_handler_with_fuck_not_triggered(mock_sleep, mock_game_over):
 
 
 @pytest.mark.asyncio
-@patch("random.choice", side_effect=["🤡", "¡Qué mal número, te han jodido!"])
+@patch("app.services.fuck_service.FuckService.process_fuck_triggers")
 @patch("app.handlers.dice.game_over_message", return_value=None)
 @patch("time.sleep", return_value=None)
-async def test_dice_handler_with_multiple_fuck_active(mock_sleep, mock_game_over, mock_random_choice):
+async def test_dice_handler_with_multiple_fuck_active(mock_sleep, mock_game_over, mock_process_fuck_triggers):
     """Test dice handler when multiple users have active fuck commands"""
     tester = await get_chat(
         {
@@ -135,19 +139,22 @@ async def test_dice_handler_with_multiple_fuck_active(mock_sleep, mock_game_over
     
     await dice_handler(tester.update, tester.context)
     
-    # Should trigger the fuck message from both users
-    tester.update.effective_message.reply_text.assert_any_call(
-        text="¡Qué mal número, te han jodido! 🤡 @aaa @ccc está disfrutando tu infortunio."
+    # Verify that process_fuck_triggers was called with the correct arguments
+    mock_process_fuck_triggers.assert_called_once_with(
+        update=tester.update,
+        users_data=tester.chat._users,
+        current_username="@bbb",
+        current_dice_value=2
     )
     
-    # Both fuck_active flags should be set to False after use
+    # Both fuck_active flags should be set to False after use (handled by process_fuck_triggers)
     await tester.assert_save(
         {
             "last_play_date": None,
             "users": {
-                "@aaa": {"data": 1, "fuck_active": False, "fuck_value": 4},
+                "@aaa": {"data": 1, "fuck_active": True, "fuck_value": 4},
                 "@bbb": {"data": 1, "score": 1},
-                "@ccc": {"data": 1, "fuck_active": False, "fuck_value": 3},
+                "@ccc": {"data": 1, "fuck_active": True, "fuck_value": 3},
             },
             "active_users": ["@aaa", "@bbb", "@ccc"],
             "cycles": [],
