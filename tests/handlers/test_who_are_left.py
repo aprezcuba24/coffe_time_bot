@@ -50,4 +50,6 @@ async def test_no_one_is_missing():
         },
     )
     await who_are_left_command(tester.update, tester.context)
-    tester.assert_reply_text(text="Todavía faltan por tirar @bbb @ccc")
+    tester.assert_reply_text(
+        text="Todavía faltan por tirar @bbb @ccc\nLos perdedores hasta ahora, con 1 son: @aaa"
+    )

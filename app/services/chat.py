@@ -79,7 +79,7 @@ class CycleItem:
                 min_value = item["value"]
             elif item["value"] == min_value:
                 users.append(key)
-        return users
+        return users, min_value
 
     def is_completed(self):
         return len(self._users) == len(self._points)
@@ -164,11 +164,14 @@ class ChatItem:
     def abort(self):
         self._cycles = []
 
-    def game_over(self):
+    def who_are_losing(self):
         if not self.has_open_game():
             raise Exception("There are not open game.")
         last_cycle: CycleItem = self._get_last_cycle()
-        usernames = last_cycle.get_users_by_score()
+        return last_cycle.get_users_by_score()
+
+    def game_over(self):
+        usernames, _ = self.who_are_losing()
         if len(usernames) == 0:
             return None
         elif len(usernames) > 1:
