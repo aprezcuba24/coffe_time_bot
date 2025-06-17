@@ -15,6 +15,11 @@ async def abort_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return await update.effective_message.reply_text(
             text="No hay partida abierta.",
         )
+    are_losing, _ = chat.who_are_losing()
+    if chat.active_username in are_losing:
+        return await update.effective_message.reply_text(
+            text="No puedes abortar el juego, si estás perdiendo. 😏"
+        )
     return await update.effective_message.reply_text(
         reply_markup=InlineKeyboardMarkup([[YES_BUTTON, NO_BUTTON]]),
         text="¿Está seguro, quiere abortar el juego?",

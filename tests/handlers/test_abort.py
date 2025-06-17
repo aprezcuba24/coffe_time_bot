@@ -32,14 +32,19 @@ async def test_user_no_open_game():
 
 
 @pytest.mark.asyncio
-async def test_no_has_open_game():
+async def test_has_open_game():
     tester = await get_chat(
         {
             "users": {"@aaa": {"data": 1}},
-            "active_users": ["@aaa"],
-            "cycles": [{"users": ["@aaa", "@bbb"], "points": {"@aaa": {}}}],
+            "active_users": ["@aaa", "@bbb"],
+            "cycles": [
+                {
+                    "users": ["@aaa", "@bbb"],
+                    "points": {"@aaa": {"value": 1}, "@bbb": {"value": 2}},
+                }
+            ],
         },
-        username="aaa",
+        username="bbb",
     )
     assert await abort_command(tester.update, tester.context)
     tester.assert_reply_text(
@@ -49,11 +54,32 @@ async def test_no_has_open_game():
 
 
 @pytest.mark.asyncio
-async def test_abort_no_query():
+async def test_is_losing():
     tester = await get_chat(
         {
             "users": {"@aaa": {"data": 1}},
             "active_users": ["@aaa"],
+            "cycles": [
+                {
+                    "users": ["@aaa", "@bbb"],
+                    "points": {"@aaa": {"value": 1}, "@bbb": {"value": 2}},
+                }
+            ],
+        },
+        username="aaa",
+    )
+    assert await abort_command(tester.update, tester.context)
+    tester.assert_reply_text(
+        text="No puedes abortar el juego, si estás perdiendo. 😏",
+    )
+
+
+@pytest.mark.asyncio
+async def test_abort_no_query():
+    tester = await get_chat(
+        {
+            "users": {"@aaa": {"data": 1}},
+            "active_users": ["@aaa", "@bbb"],
             "cycles": [{"users": ["@aaa", "@bbb"], "points": {"@aaa": {}}}],
         },
         username="aaa",
