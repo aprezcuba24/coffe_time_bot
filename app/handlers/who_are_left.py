@@ -24,5 +24,5 @@ async def who_are_left_command(update: Update, context: ContextTypes.DEFAULT_TYP
     icon = ICONS.get(value, "")
     return await update.effective_message.reply_text(
         text=f"Todavía faltan por tirar {' '.join(users)}\n"
-        + f"Los perdedores hasta ahora, con {icon} son: {' '.join(are_losing)}"
+        + f"Los perdedores hasta ahora con {icon} son: {' '.join(are_losing)}"
     )
