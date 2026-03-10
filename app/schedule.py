@@ -4,7 +4,7 @@ from datetime import datetime
 from app.application import get_application
 from app.services.chat import ChatItem, start_params
 
-HOURS_DIFFERENCE = 5
+HOURS_DIFFERENCE = 4
 application = get_application()
 
 
